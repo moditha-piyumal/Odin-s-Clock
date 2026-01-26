@@ -5,6 +5,7 @@ const generateId = () =>
 
 const expandable = document.getElementById("expandable");
 const clockElement = document.querySelector(".clock");
+const nextTaskElement = document.querySelector(".next-task");
 const dailyBtn = document.getElementById("dailyTaskBtn");
 const oneTimeBtn = document.getElementById("oneTimeTaskBtn");
 const dailyForm = document.getElementById("dailyTaskForm");
@@ -167,9 +168,7 @@ const scheduleClockUpdates = () => {
 	);
 };
 
-const renderScheduledTasks = () => {
-	scheduledList.innerHTML = "";
-
+const getScheduledItems = () => {
 	const items = [];
 
 	for (const task of scheduledTasksCache) {
@@ -209,6 +208,32 @@ const renderScheduledTasks = () => {
 
 	// Sort by time
 	items.sort((a, b) => a.dateTime - b.dateTime);
+
+	return items;
+};
+
+const renderNextTask = (items) => {
+	if (!nextTaskElement) return;
+
+	if (items.length === 0) {
+		nextTaskElement.textContent = "Next (no tasks yet)";
+		return;
+	}
+
+	const nextItem = items[0];
+	const timeLabel = nextItem.dateTime.toLocaleTimeString([], {
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+
+	nextTaskElement.textContent = `Next: ${nextItem.task.name} at ${timeLabel}`;
+};
+
+const renderScheduledTasks = () => {
+	scheduledList.innerHTML = "";
+
+	const items = getScheduledItems();
+	renderNextTask(items);
 
 	if (items.length === 0) {
 		scheduledList.innerHTML = `<div class="scheduled-empty">No scheduled tasks yet</div>`;
