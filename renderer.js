@@ -2,6 +2,10 @@ let isExpanded = false;
 
 const expandable = document.getElementById("expandable");
 const clockElement = document.querySelector(".clock");
+const dailyBtn = document.getElementById("dailyTaskBtn");
+const oneTimeBtn = document.getElementById("oneTimeTaskBtn");
+const dailyForm = document.getElementById("dailyTaskForm");
+const oneTimeForm = document.getElementById("oneTimeTaskForm");
 
 const padTime = (value) => String(value).padStart(2, "0");
 
@@ -12,6 +16,16 @@ const renderClock = () => {
 	clockElement.textContent = `${hours}:${minutes}`;
 };
 
+dailyBtn.addEventListener("click", () => {
+	dailyForm.classList.remove("hidden");
+	oneTimeForm.classList.add("hidden");
+});
+
+oneTimeBtn.addEventListener("click", () => {
+	oneTimeForm.classList.remove("hidden");
+	dailyForm.classList.add("hidden");
+});
+
 const scheduleClockUpdates = () => {
 	renderClock();
 
@@ -19,10 +33,13 @@ const scheduleClockUpdates = () => {
 	const msUntilNextMinute =
 		(60 - now.getSeconds()) * 1000 - now.getMilliseconds();
 
-	setTimeout(() => {
-		renderClock();
-		setInterval(renderClock, 60_000);
-	}, Math.max(msUntilNextMinute, 0));
+	setTimeout(
+		() => {
+			renderClock();
+			setInterval(renderClock, 60_000);
+		},
+		Math.max(msUntilNextMinute, 0),
+	);
 };
 
 scheduleClockUpdates();

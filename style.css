@@ -190,3 +190,86 @@ body {
     font-style: italic;
     opacity: 0.6;
 }
+
+/* ============================= */
+/* 🪟 MODAL SHELL – STEP 2 */
+/* ============================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    width: 320px;
+    background: rgba(30, 30, 30, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    padding: 16px;
+    color: #fff;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.modal-header button {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.modal-header button:hover {
+    opacity: 1;
+}
+
+.modal-content {
+    font-size: 14px;
+}
+
+/* Hidden state */
+.hidden {
+    display: none;
+}
+
+/* ============================= */
+/* 📅 MODAL TASK TYPE SELECT */
+/* ============================= */
+
+.task-type-select {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.task-type-select button {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: inherit;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.task-type-select button:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.task-form {
+    font-size: 13px;
+}
