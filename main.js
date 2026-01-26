@@ -109,7 +109,7 @@ function openScheduleModal() {
 	scheduleModal = new BrowserWindow({
 		width: 600,
 		height: 600,
-		x: x - 600 - 16,
+		x: x + width + 16,
 		y,
 		title: "Schedule a Task",
 		resizable: false,
