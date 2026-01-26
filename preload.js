@@ -14,4 +14,5 @@ contextBridge.exposeInMainWorld("scheduledTasks", {
 	add: (task) => ipcRenderer.invoke("scheduledTasks:add", task),
 	markDone: (id, meta) =>
 		ipcRenderer.invoke("scheduledTasks:markDone", id, meta),
+	markDeleted: (id) => ipcRenderer.invoke("scheduledTasks:markDeleted", id),
 });

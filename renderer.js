@@ -22,7 +22,14 @@ const oneError = document.getElementById("oneTimeTaskError");
 const padTime = (value) => String(value).padStart(2, "0");
 
 //Today helper
-const getTodayISO = () => new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+// ✅ Local date helper (Sri Lanka / system local time)
+const getTodayLocalISO = () => {
+	const d = new Date();
+	const y = d.getFullYear();
+	const m = String(d.getMonth() + 1).padStart(2, "0");
+	const day = String(d.getDate()).padStart(2, "0");
+	return `${y}-${m}-${day}`; // YYYY-MM-DD (local)
+};
 
 const scheduledList = document.getElementById("scheduledTasksList");
 let scheduledTasksCache = [];
@@ -163,10 +170,11 @@ const scheduleClockUpdates = () => {
 const renderScheduledTasks = () => {
 	scheduledList.innerHTML = "";
 
-	const now = getNow();
 	const items = [];
 
 	for (const task of scheduledTasksCache) {
+		const now = getNow();
+		if (task.deleted) continue; // 👈 add this line
 		if (task.type === "oneTime") {
 			if (task.done) continue;
 
@@ -182,7 +190,7 @@ const renderScheduledTasks = () => {
 
 		if (task.type === "daily") {
 			// 🚫 Skip if already done today
-			if (task.lastDoneDate === getTodayISO()) {
+			if (task.lastDoneDate === getTodayLocalISO()) {
 				continue;
 			}
 
@@ -221,7 +229,7 @@ const renderScheduledTasks = () => {
 		doneBtn.addEventListener("click", async () => {
 			if (item.task.type === "daily") {
 				await window.scheduledTasks.markDone(item.task.id, {
-					date: getTodayISO(),
+					date: getTodayLocalISO(),
 				});
 			}
 
@@ -232,8 +240,19 @@ const renderScheduledTasks = () => {
 			await loadAndRenderScheduledTasks();
 		});
 
+		const deleteBtn = document.createElement("button");
+		deleteBtn.textContent = "Delete";
+		deleteBtn.className = "scheduled-delete-btn";
+
+		deleteBtn.addEventListener("click", async () => {
+			await window.scheduledTasks.markDeleted(item.task.id);
+			await loadAndRenderScheduledTasks();
+		});
+
 		el.appendChild(label);
 		el.appendChild(doneBtn);
+		el.appendChild(deleteBtn);
+
 		scheduledList.appendChild(el);
 	}
 };

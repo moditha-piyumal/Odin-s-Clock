@@ -165,6 +165,17 @@ ipcMain.handle("scheduledTasks:markDone", (event, taskId, meta = {}) => {
 	return tasksCache;
 });
 
+ipcMain.handle("scheduledTasks:markDeleted", (event, taskId) => {
+	const task = tasksCache.find((t) => t.id === taskId);
+	if (!task) return tasksCache;
+
+	task.deleted = true;
+	task.deletedAt = new Date().toISOString();
+
+	saveTasksToDisk();
+	return tasksCache;
+});
+
 // ===============================
 // 🚀 APP LIFECYCLE
 // ===============================
