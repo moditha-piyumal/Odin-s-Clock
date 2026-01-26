@@ -21,6 +21,9 @@ const oneError = document.getElementById("oneTimeTaskError");
 
 const padTime = (value) => String(value).padStart(2, "0");
 
+//Today helper
+const getTodayISO = () => new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
 const scheduledList = document.getElementById("scheduledTasksList");
 let scheduledTasksCache = [];
 const getNow = () => new Date();
@@ -174,11 +177,20 @@ const renderScheduledTasks = () => {
 		}
 
 		if (task.type === "daily") {
+			// 🚫 Skip if already done today
+			if (task.lastDoneDate === getTodayISO()) {
+				continue;
+			}
+
 			const nextDt = getNextDailyDateTime(task);
+
 			items.push({
 				task,
 				dateTime: nextDt,
-				label: `${task.name} – ${nextDt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+				label: `${task.name} – ${nextDt.toLocaleTimeString([], {
+					hour: "2-digit",
+					minute: "2-digit",
+				})}`,
 			});
 		}
 	}
@@ -194,7 +206,30 @@ const renderScheduledTasks = () => {
 	for (const item of items) {
 		const el = document.createElement("div");
 		el.className = "scheduled-item";
-		el.textContent = item.label;
+
+		const label = document.createElement("span");
+		label.textContent = item.label;
+
+		const doneBtn = document.createElement("button");
+		doneBtn.textContent = "Done";
+		doneBtn.className = "scheduled-done-btn";
+
+		doneBtn.addEventListener("click", async () => {
+			if (item.task.type === "daily") {
+				await window.scheduledTasks.markDone(item.task.id, {
+					date: getTodayISO(),
+				});
+			}
+
+			if (item.task.type === "oneTime") {
+				await window.scheduledTasks.markDone(item.task.id);
+			}
+
+			await loadAndRenderScheduledTasks();
+		});
+
+		el.appendChild(label);
+		el.appendChild(doneBtn);
 		scheduledList.appendChild(el);
 	}
 };
