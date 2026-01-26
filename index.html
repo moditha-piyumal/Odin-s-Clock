@@ -92,7 +92,49 @@
         </div>
     </div>
 
-    <script src="renderer.js"></script>
+    <div class="modal-backdrop hidden" id="schedule-modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Schedule a Task</h2>
+                <button class="icon-button" id="close-schedule-modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-step" id="task-type-step">
+                    <p class="modal-label">Is this task daily or one time?</p>
+                    <div class="task-type-options">
+                        <button class="secondary-button" data-task-type="daily">
+                            Daily Task
+                        </button>
+                        <button class="secondary-button" data-task-type="once">
+                            One Time Task
+                        </button>
+                    </div>
+                </div>
+                <form class="modal-step hidden" id="task-details-step">
+                    <label class="input-group">
+                        <span>Task name</span>
+                        <input type="text" id="task-title" required />
+                    </label>
+                    <label class="input-group hidden" id="task-date-group">
+                        <span>Date</span>
+                        <input type="date" id="task-date" />
+                    </label>
+                    <label class="input-group">
+                        <span>Time</span>
+                        <input type="time" id="task-time" required />
+                    </label>
+                    <div class="modal-actions">
+                        <button type="button" class="secondary-button" id="back-to-type">
+                            Back
+                        </button>
+                        <button type="submit" class="primary-button">
+                            Save Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
