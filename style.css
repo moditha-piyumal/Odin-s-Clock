@@ -1,6 +1,12 @@
 * {
     box-sizing: border-box;
-    font-family: "Segoe UI", sans-serif;
+    font-family:
+        "Palatino Linotype",
+        "Book Antiqua",
+        Palatino,
+        "Georgia",
+        "Times New Roman",
+        serif;
 }
 
 html,
@@ -85,7 +91,7 @@ body {
 /* ===== Content ===== */
 
 .content {
-    padding: 24px;
+    padding: 16px 18px;
 }
 
 /* ============================= */
@@ -93,20 +99,32 @@ body {
 /* ============================= */
 
 .top-section {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
+    /* ↓ from 12px */
 }
 
 .clock {
-    font-size: 42px;
-    font-weight: 600;
-    line-height: 1.1;
+    font-size: 36px;
+    /* ↓ from 42px */
+    font-weight: 700;
+    /* more authority */
+    line-height: 1.0;
+    /* 🔑 very important */
+    letter-spacing: 0.04em;
+    /* subtle carved look */
     font-variant-numeric: tabular-nums;
 }
 
 .next-task {
-    opacity: 0.75;
-    font-size: 14px;
-    margin-top: 4px;
+    margin-top: 6px;
+    /* slightly more than before */
+    font-size: 13px;
+    /* subtle */
+    line-height: 1.2;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ============================= */
