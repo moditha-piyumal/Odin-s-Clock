@@ -151,3 +151,42 @@ body {
     font-size: 14px;
     opacity: 0.85;
 }
+
+/* ============================= */
+/* 📅 SCHEDULED TASKS – STEP 1 */
+/* ============================= */
+
+.scheduled-tasks {
+    margin-top: 12px;
+}
+
+.scheduled-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.scheduled-header button {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: inherit;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.scheduled-header button:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.scheduled-list {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.scheduled-empty {
+    font-style: italic;
+    opacity: 0.6;
+}
