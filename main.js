@@ -1,6 +1,11 @@
 const { app, BrowserWindow, ipcMain, screen } = require("electron");
+const fs = require("fs");
+const path = require("path");
 
 let win = null;
+
+let tasksCache = [];
+let tasksFilePath;
 
 // ===============================
 // 🧱 WINDOW SIZE CONSTANTS
@@ -16,6 +21,23 @@ const SHADOW_OFFSET = 12;
 // 🪟 CREATE WINDOW
 // ===============================
 function createWindow() {
+	const userDataPath = app.getPath("userData");
+	tasksFilePath = path.join(userDataPath, "scheduled_tasks.json");
+
+	// Create file if it doesn't exist
+	if (!fs.existsSync(tasksFilePath)) {
+		fs.writeFileSync(tasksFilePath, JSON.stringify([], null, 2));
+	}
+
+	// Load once into memory
+	try {
+		const raw = fs.readFileSync(tasksFilePath, "utf-8");
+		tasksCache = JSON.parse(raw);
+	} catch (err) {
+		console.error("Failed to load scheduled tasks:", err);
+		tasksCache = [];
+	}
+
 	const displays = screen.getAllDisplays();
 
 	// Prefer vertical monitor, fallback to primary
@@ -121,3 +143,11 @@ app.on("window-all-closed", () => {
 		app.quit();
 	}
 });
+
+function saveTasksToDisk() {
+	try {
+		fs.writeFileSync(tasksFilePath, JSON.stringify(tasksCache, null, 2));
+	} catch (err) {
+		console.error("Failed to save scheduled tasks:", err);
+	}
+}
