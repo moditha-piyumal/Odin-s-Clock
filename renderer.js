@@ -160,8 +160,6 @@ const scheduleClockUpdates = () => {
 	);
 };
 
-scheduleClockUpdates();
-
 const renderScheduledTasks = () => {
 	scheduledList.innerHTML = "";
 
@@ -261,3 +259,4 @@ window.windowControls.onCollapsed(() => {
 });
 
 loadAndRenderScheduledTasks();
+scheduleClockUpdates();
