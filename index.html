@@ -19,10 +19,23 @@
             </div>
         </div>
 
-        <div class="content">
-            <h1>Glassmorphism</h1>
-            <p>This app does nothing — and looks expensive.</p>
+        <div class="content" id="app">
+            <!-- ALWAYS VISIBLE -->
+            <div class="top-section">
+                <div class="clock">12:45</div>
+                <div class="next-task">Next: (no tasks yet)</div>
+            </div>
+
+            <!-- EXPANDABLE -->
+            <div class="expandable collapsed" id="expandable">
+                <div class="section">Scheduled Tasks (empty)</div>
+                <div class="section">Intermittent Fasting (empty)</div>
+                <div class="section">Pomodoro (empty)</div>
+            </div>
         </div>
+
+        <script src="renderer.js"></script>
+
     </div>
 </body>
 

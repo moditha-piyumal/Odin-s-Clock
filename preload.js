@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld("windowControls", {
 	close: () => ipcRenderer.send("window:close"),
 
 	expand: () => ipcRenderer.send("window:expand"),
-	collapse: () => ipcRenderer.send("window:collapse"),
+
+	onCollapsed: (callback) => ipcRenderer.on("window:collapsed", callback),
 });

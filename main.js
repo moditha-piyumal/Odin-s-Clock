@@ -79,15 +79,17 @@ function expandWindow() {
 function collapseWindow() {
 	if (!win) return;
 
-	const { x, y, width, height } = win.getBounds();
+	const { x, y, height } = win.getBounds();
 
 	win.setBounds({
 		width: WINDOW_WIDTH,
 		height: COLLAPSED_HEIGHT,
 		x,
-		// Collapse downward: move Y back down
 		y: y + (height - COLLAPSED_HEIGHT),
 	});
+
+	// 🔔 notify renderer
+	win.webContents.send("window:collapsed");
 }
 
 // ===============================
