@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, screen } = require("electron");
 
 let win = null;
+let scheduleModal = null;
 
 // ===============================
 // 🧱 WINDOW SIZE CONSTANTS
@@ -93,6 +94,40 @@ function collapseWindow() {
 }
 
 // ===============================
+// 🗓️ SCHEDULE MODAL
+// ===============================
+function openScheduleModal() {
+	if (!win) return;
+
+	if (scheduleModal) {
+		scheduleModal.focus();
+		return;
+	}
+
+	const { x, y, width } = win.getBounds();
+
+	scheduleModal = new BrowserWindow({
+		width: 600,
+		height: 600,
+		x: x + width + 16,
+		y,
+		title: "Schedule a Task",
+		resizable: false,
+		parent: win,
+		modal: true,
+		backgroundColor: "#1d1d1d",
+		webPreferences: {
+			contextIsolation: true,
+		},
+	});
+
+	scheduleModal.loadFile("schedule-modal.html");
+	scheduleModal.on("closed", () => {
+		scheduleModal = null;
+	});
+}
+
+// ===============================
 // 📡 IPC EVENTS
 // ===============================
 ipcMain.on("window:minimize", () => {
@@ -109,6 +144,10 @@ ipcMain.on("window:expand", () => {
 
 ipcMain.on("window:collapse", () => {
 	collapseWindow();
+});
+
+ipcMain.on("window:open-schedule-modal", () => {
+	openScheduleModal();
 });
 
 // ===============================

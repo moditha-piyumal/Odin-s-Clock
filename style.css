@@ -151,3 +151,24 @@ body {
     font-size: 14px;
     opacity: 0.85;
 }
+
+.section.scheduled-tasks {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.section-button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.section-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

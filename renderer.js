@@ -2,6 +2,7 @@ let isExpanded = false;
 
 const expandable = document.getElementById("expandable");
 const clockElement = document.querySelector(".clock");
+const scheduleTaskButton = document.getElementById("schedule-task-button");
 
 const padTime = (value) => String(value).padStart(2, "0");
 
@@ -26,6 +27,13 @@ const scheduleClockUpdates = () => {
 };
 
 scheduleClockUpdates();
+
+if (scheduleTaskButton) {
+	scheduleTaskButton.addEventListener("click", (event) => {
+		event.stopPropagation();
+		window.windowControls.openScheduleModal();
+	});
+}
 
 // Click → expand
 document.addEventListener("click", () => {
