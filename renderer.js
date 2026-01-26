@@ -140,6 +140,7 @@ document
 
 const scheduleClockUpdates = () => {
 	renderClock();
+	renderScheduledTasks(); // 👈 initial render sync
 
 	const now = new Date();
 	const msUntilNextMinute =
@@ -148,7 +149,12 @@ const scheduleClockUpdates = () => {
 	setTimeout(
 		() => {
 			renderClock();
-			setInterval(renderClock, 60_000);
+			renderScheduledTasks(); // 👈 minute boundary sync
+
+			setInterval(() => {
+				renderClock();
+				renderScheduledTasks(); // 👈 every minute
+			}, 60_000);
 		},
 		Math.max(msUntilNextMinute, 0),
 	);
