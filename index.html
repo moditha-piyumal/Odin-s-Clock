@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Glass Demo</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="window">
+        <div class="titlebar" ondblclick="window.windowControls.maximize()">
+            <span class="title">Glass Demo</span>
+
+            <div class="window-controls">
+                <button onclick="window.windowControls.minimize()">—</button>
+                <button onclick="window.windowControls.maximize()">⬜</button>
+                <button onclick="window.windowControls.close()">✕</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1>Glassmorphism</h1>
+            <p>This app does nothing — and looks expensive.</p>
+        </div>
+    </div>
+</body>
+
+</html>
