@@ -273,3 +273,45 @@ body {
 .task-form {
     font-size: 13px;
 }
+
+/* ============================= */
+/* 📝 MODAL FORMS – STEP 4 */
+/* ============================= */
+
+.task-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.task-form input {
+    width: 100%;
+    margin-top: 4px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.25);
+    color: #fff;
+}
+
+.task-form button {
+    margin-top: 12px;
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: inherit;
+    cursor: pointer;
+}
+
+.task-form button:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.form-error {
+    margin-top: 8px;
+    color: #ffb3b3;
+    font-size: 12px;
+}

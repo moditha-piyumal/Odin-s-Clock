@@ -47,7 +47,7 @@
         <!-- ============================= -->
         <!-- 📅 SCHEDULE MODAL (STEP 2) -->
         <!-- ============================= -->
-        <div id="scheduleModalOverlay" class="modal-overlay hidden">
+        <div id="scheduleModalOverlay" class="modal-overlay">
             <div class="modal-box">
                 <div class="modal-header">
                     <span>Add Scheduled Task</span>
@@ -63,12 +63,43 @@
                         </div>
 
                         <div id="dailyTaskForm" class="task-form hidden">
-                            <p style="opacity: 0.7;">Daily task form (next step)</p>
+                            <label>
+                                Task Name
+                                <input type="text" id="dailyTaskName" />
+                            </label>
+
+                            <label>
+                                Time
+                                <input type="time" id="dailyTaskTime" />
+                            </label>
+
+                            <div class="form-error hidden" id="dailyTaskError"></div>
+
+                            <button id="saveDailyTaskBtn">Save Daily Task</button>
                         </div>
 
+
                         <div id="oneTimeTaskForm" class="task-form hidden">
-                            <p style="opacity: 0.7;">One-time task form (next step)</p>
+                            <label>
+                                Task Name
+                                <input type="text" id="oneTimeTaskName" />
+                            </label>
+
+                            <label>
+                                Date
+                                <input type="date" id="oneTimeTaskDate" />
+                            </label>
+
+                            <label>
+                                Time
+                                <input type="time" id="oneTimeTaskTime" />
+                            </label>
+
+                            <div class="form-error hidden" id="oneTimeTaskError"></div>
+
+                            <button id="saveOneTimeTaskBtn">Save One-Time Task</button>
                         </div>
+
 
                     </div>
 
