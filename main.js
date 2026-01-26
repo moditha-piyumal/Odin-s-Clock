@@ -133,6 +133,38 @@ ipcMain.on("window:collapse", () => {
 	collapseWindow();
 });
 
+// ================================
+// 📡 STEP 6: SCHEDULE IPC
+// ================================
+
+ipcMain.handle("scheduledTasks:load", () => {
+	return tasksCache;
+});
+
+ipcMain.handle("scheduledTasks:add", (event, task) => {
+	tasksCache.push(task);
+	saveTasksToDisk();
+	return tasksCache;
+});
+
+ipcMain.handle("scheduledTasks:markDone", (event, taskId, meta = {}) => {
+	const task = tasksCache.find((t) => t.id === taskId);
+	if (!task) return tasksCache;
+
+	if (task.type === "oneTime") {
+		task.done = true;
+		task.doneAt = new Date().toISOString();
+	}
+
+	if (task.type === "daily") {
+		task.lastDoneDate = meta.date;
+		task.lastDoneAt = new Date().toISOString();
+	}
+
+	saveTasksToDisk();
+	return tasksCache;
+});
+
 // ===============================
 // 🚀 APP LIFECYCLE
 // ===============================
@@ -151,3 +183,5 @@ function saveTasksToDisk() {
 		console.error("Failed to save scheduled tasks:", err);
 	}
 }
+
+// const { ipcMain } = require("electron");

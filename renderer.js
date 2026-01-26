@@ -1,5 +1,8 @@
 let isExpanded = false;
 
+const generateId = () =>
+	crypto.randomUUID?.() || Math.random().toString(36).slice(2);
+
 const expandable = document.getElementById("expandable");
 const clockElement = document.querySelector(".clock");
 const dailyBtn = document.getElementById("dailyTaskBtn");
@@ -17,6 +20,47 @@ const oneTimeInput = document.getElementById("oneTimeTaskTime");
 const oneError = document.getElementById("oneTimeTaskError");
 
 const padTime = (value) => String(value).padStart(2, "0");
+
+const scheduledList = document.getElementById("scheduledTasksList");
+let scheduledTasksCache = [];
+const getNow = () => new Date();
+const getNextDailyDateTime = (task) => {
+	const now = getNow();
+
+	const [hh, mm] = task.time.split(":").map(Number);
+	const today = new Date(now);
+	today.setHours(hh, mm, 0, 0);
+
+	if (today > now) return today;
+
+	const tomorrow = new Date(today);
+	tomorrow.setDate(today.getDate() + 1);
+	return tomorrow;
+};
+
+// Modal Helpers
+const modalOverlay = document.getElementById("scheduleModalOverlay");
+const closeModalBtn = document.getElementById("closeScheduleModal");
+const addScheduledBtn = document.getElementById("addScheduledTaskBtn");
+
+const closeModal = () => {
+	modalOverlay.classList.add("hidden");
+	dailyForm.classList.add("hidden");
+	oneTimeForm.classList.add("hidden");
+
+	dailyNameInput.value = "";
+	dailyTimeInput.value = "";
+	oneNameInput.value = "";
+	oneDateInput.value = "";
+	oneTimeInput.value = "";
+};
+
+addScheduledBtn.addEventListener("click", () => {
+	modalOverlay.classList.remove("hidden");
+});
+
+closeModalBtn.addEventListener("click", closeModal);
+
 // Clock rendering
 const renderClock = () => {
 	const now = new Date();
@@ -38,42 +82,58 @@ oneTimeBtn.addEventListener("click", () => {
 });
 
 // Tasks form validation
-document.getElementById("saveDailyTaskBtn").addEventListener("click", () => {
-	dailyError.classList.add("hidden");
+document
+	.getElementById("saveDailyTaskBtn")
+	.addEventListener("click", async () => {
+		dailyError.classList.add("hidden");
 
-	if (!dailyNameInput.value || !dailyTimeInput.value) {
-		dailyError.textContent = "Please enter a task name and time.";
-		dailyError.classList.remove("hidden");
-		return;
-	}
+		if (!dailyNameInput.value || !dailyTimeInput.value) {
+			dailyError.textContent = "Please enter a task name and time.";
+			dailyError.classList.remove("hidden");
+			return;
+		}
 
-	const task = {
-		type: "daily",
-		name: dailyNameInput.value.trim(),
-		time: dailyTimeInput.value,
-	};
+		const task = {
+			id: generateId(),
+			type: "daily",
+			name: dailyNameInput.value.trim(),
+			time: dailyTimeInput.value,
+			createdAt: new Date().toISOString(),
+			lastDoneDate: null,
+		};
 
-	console.log("Daily task:", task);
-});
+		await window.scheduledTasks.add(task);
+		await loadAndRenderScheduledTasks();
 
-document.getElementById("saveOneTimeTaskBtn").addEventListener("click", () => {
-	oneError.classList.add("hidden");
+		closeModal();
+	});
 
-	if (!oneNameInput.value || !oneDateInput.value || !oneTimeInput.value) {
-		oneError.textContent = "Please fill all fields.";
-		oneError.classList.remove("hidden");
-		return;
-	}
+document
+	.getElementById("saveOneTimeTaskBtn")
+	.addEventListener("click", async () => {
+		oneError.classList.add("hidden");
 
-	const task = {
-		type: "oneTime",
-		name: oneNameInput.value.trim(),
-		date: oneDateInput.value,
-		time: oneTimeInput.value,
-	};
+		if (!oneNameInput.value || !oneDateInput.value || !oneTimeInput.value) {
+			oneError.textContent = "Please fill all fields.";
+			oneError.classList.remove("hidden");
+			return;
+		}
 
-	console.log("One-time task:", task);
-});
+		const task = {
+			id: generateId(),
+			type: "oneTime",
+			name: oneNameInput.value.trim(),
+			date: oneDateInput.value,
+			time: oneTimeInput.value,
+			createdAt: new Date().toISOString(),
+			done: false,
+		};
+
+		await window.scheduledTasks.add(task);
+		await loadAndRenderScheduledTasks();
+
+		closeModal();
+	});
 
 const scheduleClockUpdates = () => {
 	renderClock();
@@ -93,6 +153,57 @@ const scheduleClockUpdates = () => {
 
 scheduleClockUpdates();
 
+const renderScheduledTasks = () => {
+	scheduledList.innerHTML = "";
+
+	const now = getNow();
+	const items = [];
+
+	for (const task of scheduledTasksCache) {
+		if (task.type === "oneTime") {
+			if (task.done) continue;
+
+			const dt = new Date(`${task.date}T${task.time}`);
+			if (dt > now) {
+				items.push({
+					task,
+					dateTime: dt,
+					label: `${task.name} – ${task.date} ${task.time}`,
+				});
+			}
+		}
+
+		if (task.type === "daily") {
+			const nextDt = getNextDailyDateTime(task);
+			items.push({
+				task,
+				dateTime: nextDt,
+				label: `${task.name} – ${nextDt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`,
+			});
+		}
+	}
+
+	// Sort by time
+	items.sort((a, b) => a.dateTime - b.dateTime);
+
+	if (items.length === 0) {
+		scheduledList.innerHTML = `<div class="scheduled-empty">No scheduled tasks yet</div>`;
+		return;
+	}
+
+	for (const item of items) {
+		const el = document.createElement("div");
+		el.className = "scheduled-item";
+		el.textContent = item.label;
+		scheduledList.appendChild(el);
+	}
+};
+
+const loadAndRenderScheduledTasks = async () => {
+	scheduledTasksCache = await window.scheduledTasks.load();
+	renderScheduledTasks();
+};
+
 // Click → expand
 document.addEventListener("click", () => {
 	if (isExpanded) return;
@@ -107,3 +218,5 @@ window.windowControls.onCollapsed(() => {
 	isExpanded = false;
 	expandable.classList.add("collapsed");
 });
+
+loadAndRenderScheduledTasks();
