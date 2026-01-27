@@ -56,6 +56,7 @@ const startPomodoroBtn = document.getElementById("startPomodoroBtn");
 // 🍅 POMODORO DONUT UI (STEP 3)
 const pomodoroTimeDisplay = document.getElementById("pomodoroTimeDisplay");
 const pomodoroPhaseLabel = document.getElementById("pomodoroPhaseLabel");
+const pomodoroDonutRing = document.querySelector(".pomodoro-donut-ring");
 
 if (pomodoroTimeDisplay) {
 	pomodoroTimeDisplay.textContent = "25:00";
@@ -79,6 +80,55 @@ if (startPomodoroBtn) {
 			60;
 		pomodoroState.totalSessions =
 			Number.isFinite(totalSessions) && totalSessions > 0 ? totalSessions : 4;
+
+		// 🍅 POMODORO COUNTDOWN ENGINE (STEP 4)
+		if (pomodoroState.timerId) {
+			clearInterval(pomodoroState.timerId);
+			pomodoroState.timerId = null;
+		}
+
+		pomodoroState.phase = "focus";
+		pomodoroState.remainingSeconds = pomodoroState.focusDurationSeconds;
+
+		const totalFocusSeconds = pomodoroState.focusDurationSeconds;
+		const ringCircumference = 427;
+
+		const updatePomodoroDisplay = () => {
+			const minutes = Math.floor(pomodoroState.remainingSeconds / 60);
+			const seconds = pomodoroState.remainingSeconds % 60;
+			const timeLabel = `${padTime(minutes)}:${padTime(seconds)}`;
+
+			if (pomodoroTimeDisplay) {
+				pomodoroTimeDisplay.textContent = timeLabel;
+			}
+
+			if (pomodoroPhaseLabel) {
+				pomodoroPhaseLabel.textContent = "FOCUS";
+			}
+
+			if (pomodoroDonutRing) {
+				const offset =
+					ringCircumference *
+					(pomodoroState.remainingSeconds / totalFocusSeconds);
+				pomodoroDonutRing.style.strokeDashoffset = String(offset);
+			}
+		};
+
+		updatePomodoroDisplay();
+
+		pomodoroState.timerId = setInterval(() => {
+			pomodoroState.remainingSeconds -= 1;
+
+			if (pomodoroState.remainingSeconds <= 0) {
+				pomodoroState.remainingSeconds = 0;
+				updatePomodoroDisplay();
+				clearInterval(pomodoroState.timerId);
+				pomodoroState.timerId = null;
+				return;
+			}
+
+			updatePomodoroDisplay();
+		}, 1000);
 
 		console.log("Pomodoro config captured:", {
 			focusMinutes,
