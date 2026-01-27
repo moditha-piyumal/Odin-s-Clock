@@ -12,7 +12,7 @@ let tasksFilePath;
 // ===============================
 const WINDOW_WIDTH = 440;
 const COLLAPSED_HEIGHT = 180;
-const EXPANDED_HEIGHT = 920;
+const EXPANDED_HEIGHT = 950;
 
 // Shadow compensation (keeps visual edge tight)
 const SHADOW_OFFSET = 12;
