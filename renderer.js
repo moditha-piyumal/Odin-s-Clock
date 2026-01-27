@@ -53,6 +53,17 @@ const pomodoroFocusInput = document.getElementById("pomodoroFocusMinutes");
 const pomodoroBreakInput = document.getElementById("pomodoroBreakMinutes");
 const pomodoroSessionsInput = document.getElementById("pomodoroSessions");
 const startPomodoroBtn = document.getElementById("startPomodoroBtn");
+// 🍅 POMODORO DONUT UI (STEP 3)
+const pomodoroTimeDisplay = document.getElementById("pomodoroTimeDisplay");
+const pomodoroPhaseLabel = document.getElementById("pomodoroPhaseLabel");
+
+if (pomodoroTimeDisplay) {
+	pomodoroTimeDisplay.textContent = "25:00";
+}
+
+if (pomodoroPhaseLabel) {
+	pomodoroPhaseLabel.textContent = "IDLE";
+}
 
 if (startPomodoroBtn) {
 	startPomodoroBtn.addEventListener("click", () => {
