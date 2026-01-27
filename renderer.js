@@ -3,6 +3,34 @@ let isExpanded = false;
 const generateId = () =>
 	crypto.randomUUID?.() || Math.random().toString(36).slice(2);
 
+// =============================
+// 🍅 POMODORO STATE (STEP 1)
+// =============================
+// Represents Pomodoro timing/session data only; timers + UI wiring come later.
+const pomodoroState = {
+	phase: "idle",
+	focusDurationSeconds: 25 * 60,
+	breakDurationSeconds: 5 * 60,
+	totalSessions: 4,
+	currentSession: 0,
+	remainingSeconds: 0,
+	timerId: null,
+};
+
+const resetPomodoroState = () => {
+	pomodoroState.phase = "idle";
+	pomodoroState.focusDurationSeconds = 25 * 60;
+	pomodoroState.breakDurationSeconds = 5 * 60;
+	pomodoroState.totalSessions = 4;
+	pomodoroState.currentSession = 0;
+	pomodoroState.remainingSeconds = 0;
+	pomodoroState.timerId = null;
+};
+
+const isPomodoroActive = () => pomodoroState.phase !== "idle";
+
+const getPomodoroPhase = () => pomodoroState.phase;
+
 const expandable = document.getElementById("expandable");
 const clockElement = document.querySelector(".clock");
 const nextTaskElement = document.querySelector(".next-task");
