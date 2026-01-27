@@ -48,6 +48,35 @@ const oneDateInput = document.getElementById("oneTimeTaskDate");
 const oneTimeInput = document.getElementById("oneTimeTaskTime");
 const oneError = document.getElementById("oneTimeTaskError");
 
+// 🍅 POMODORO CONFIG UI (STEP 2)
+const pomodoroFocusInput = document.getElementById("pomodoroFocusMinutes");
+const pomodoroBreakInput = document.getElementById("pomodoroBreakMinutes");
+const pomodoroSessionsInput = document.getElementById("pomodoroSessions");
+const startPomodoroBtn = document.getElementById("startPomodoroBtn");
+
+if (startPomodoroBtn) {
+	startPomodoroBtn.addEventListener("click", () => {
+		const focusMinutes = Number(pomodoroFocusInput?.value);
+		const breakMinutes = Number(pomodoroBreakInput?.value);
+		const totalSessions = Number(pomodoroSessionsInput?.value);
+
+		pomodoroState.focusDurationSeconds =
+			(Number.isFinite(focusMinutes) && focusMinutes > 0 ? focusMinutes : 25) *
+			60;
+		pomodoroState.breakDurationSeconds =
+			(Number.isFinite(breakMinutes) && breakMinutes > 0 ? breakMinutes : 5) *
+			60;
+		pomodoroState.totalSessions =
+			Number.isFinite(totalSessions) && totalSessions > 0 ? totalSessions : 4;
+
+		console.log("Pomodoro config captured:", {
+			focusMinutes,
+			breakMinutes,
+			totalSessions,
+		});
+	});
+}
+
 const padTime = (value) => String(value).padStart(2, "0");
 
 //Today helper
