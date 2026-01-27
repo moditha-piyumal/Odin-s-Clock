@@ -48,6 +48,7 @@ body {
 /* ===== Title Bar ===== */
 
 .titlebar {
+
     height: 42px;
     padding: 0 14px;
 
@@ -67,6 +68,7 @@ body {
             rgba(60, 40, 20, 0.25),
             rgba(20, 15, 10, 0.15));
 }
+
 
 .window-controls {
     display: flex;
@@ -161,11 +163,28 @@ body {
 }
 
 .section {
+    position: relative;
+    /* 👈 important */
     padding: 16px 0;
     margin-top: 18px;
-    border-top: 1px solid rgba(255, 170, 80, 0.25);
     font-size: 14px;
     opacity: 0.85;
+}
+
+.section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+
+    background: linear-gradient(90deg,
+            rgba(255, 140, 60, 0.15),
+            rgba(255, 190, 90, 0.45),
+            rgba(255, 140, 60, 0.15));
+
+    animation: forgeBreath 6s ease-in-out infinite;
 }
 
 .section h3 {
@@ -426,4 +445,21 @@ body {
     margin-top: 4px;
     font-size: 13px;
     opacity: 0.85;
+}
+
+@keyframes forgeBreath {
+    0% {
+        opacity: 0.25;
+        filter: blur(0px);
+    }
+
+    50% {
+        opacity: 0.6;
+        filter: blur(0.3px);
+    }
+
+    100% {
+        opacity: 0.25;
+        filter: blur(0px);
+    }
 }
