@@ -20,7 +20,7 @@ const EXPANDED_HEIGHT = 950;
 // Shadow compensation (keeps visual edge tight)
 const SHADOW_OFFSET = 12;
 
-const DEV_DISABLE_AUTO_COLLAPSE = false; // DEV MODE: set to true to disable auto-collapse on blur
+const DEV_DISABLE_AUTO_COLLAPSE = true; // DEV MODE: set to true to disable auto-collapse on blur
 
 // ===============================
 // 🪟 CREATE WINDOW
