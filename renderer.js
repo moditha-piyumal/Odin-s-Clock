@@ -84,6 +84,7 @@ if (startPomodoroBtn) {
 
 		// ✅ RESET SESSION COUNT HERE
 		pomodoroState.currentSession = 0;
+		window.windowControls.lockPomodoro();
 
 		// 🍅 POMODORO COUNTDOWN ENGINE (STEP 4)
 		if (pomodoroState.timerId) {
@@ -100,7 +101,6 @@ if (startPomodoroBtn) {
 		const startFocusPhase = () => {
 			pomodoroState.phase = "focus";
 			pomodoroState.remainingSeconds = pomodoroState.focusDurationSeconds;
-			window.api.send("pomodoro:lock");
 		};
 
 		const startBreakPhase = () => {
@@ -176,7 +176,7 @@ if (startPomodoroBtn) {
 
 						// Keep state simple: idle + DONE
 						resetPomodoroState();
-						window.api.send("pomodoro:unlock");
+						window.windowControls.unlockPomodoro();
 
 						if (pomodoroTimeDisplay) pomodoroTimeDisplay.textContent = "DONE";
 						if (pomodoroPhaseLabel) pomodoroPhaseLabel.textContent = "IDLE";
@@ -211,6 +211,9 @@ if (startPomodoroBtn) {
 }
 
 const padTime = (value) => String(value).padStart(2, "0");
+// function padTime(value) {
+// 	return String(value).padStart(2, "0");
+// }
 
 //Today helper
 // ✅ Local date helper (Sri Lanka / system local time)
