@@ -1,5 +1,4 @@
 let isExpanded = false;
-let pomodoroLockExpanded = false;
 
 const generateId = () =>
 	crypto.randomUUID?.() || Math.random().toString(36).slice(2);
@@ -27,10 +26,6 @@ const resetPomodoroState = () => {
 	pomodoroState.remainingSeconds = 0;
 	pomodoroState.timerId = null;
 };
-
-const isPomodoroActive = () => pomodoroState.phase !== "idle";
-
-const getPomodoroPhase = () => pomodoroState.phase;
 
 const expandable = document.getElementById("expandable");
 const clockElement = document.querySelector(".clock");
@@ -95,7 +90,6 @@ if (startPomodoroBtn) {
 		pomodoroState.phase = "focus";
 		pomodoroState.remainingSeconds = pomodoroState.focusDurationSeconds;
 
-		const totalFocusSeconds = pomodoroState.focusDurationSeconds;
 		const ringCircumference = 427;
 
 		const startFocusPhase = () => {
@@ -211,9 +205,6 @@ if (startPomodoroBtn) {
 }
 
 const padTime = (value) => String(value).padStart(2, "0");
-// function padTime(value) {
-// 	return String(value).padStart(2, "0");
-// }
 
 //Today helper
 // ✅ Local date helper (Sri Lanka / system local time)
