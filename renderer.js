@@ -54,6 +54,27 @@ const pomodoroTimeDisplay = document.getElementById("pomodoroTimeDisplay");
 const pomodoroPhaseLabel = document.getElementById("pomodoroPhaseLabel");
 const pomodoroDonutRing = document.querySelector(".pomodoro-donut-ring");
 const pomodoroCancelBtn = document.getElementById("pomodoroCancelBtn");
+const pomodoroSessionDisplay = document.getElementById(
+	"pomodoroSessionDisplay",
+);
+const pomodoroSessionCount =
+	pomodoroSessionDisplay?.querySelector(".session-count") ?? null;
+
+const updateSessionCounter = () => {
+	if (!pomodoroSessionCount) return;
+	const currentSession = pomodoroState.currentSession + 1;
+	pomodoroSessionCount.textContent = `Session ${currentSession} / ${pomodoroState.totalSessions}`;
+};
+
+const showSessionCounter = () => {
+	if (!pomodoroSessionDisplay) return;
+	pomodoroSessionDisplay.classList.remove("hidden");
+};
+
+const hideSessionCounter = () => {
+	if (!pomodoroSessionDisplay) return;
+	pomodoroSessionDisplay.classList.add("hidden");
+};
 
 if (pomodoroTimeDisplay) {
 	pomodoroTimeDisplay.textContent = "25:00";
@@ -81,6 +102,8 @@ if (startPomodoroBtn) {
 		// ✅ RESET SESSION COUNT HERE
 		pomodoroState.currentSession = 0;
 		window.windowControls.lockPomodoro();
+		updateSessionCounter();
+		showSessionCounter();
 
 		// 🍅 POMODORO COUNTDOWN ENGINE (STEP 4)
 		if (pomodoroState.timerId) {
@@ -154,15 +177,9 @@ if (startPomodoroBtn) {
 
 				// 🔁 Phase switching (focus -> break -> focus ...)
 				if (pomodoroState.phase === "focus") {
-					// ✅ Move into break phase
-					startBreakPhase();
-					updatePomodoroDisplay();
-					return; // timer keeps running, next tick continues break
-				}
-
-				if (pomodoroState.phase === "break") {
-					// ✅ Completed one focus+break cycle (count a focus session)
+					// ✅ Count focus session completion (focus -> break)
 					pomodoroState.currentSession += 1;
+					updateSessionCounter();
 
 					// ✅ If we hit the session limit, stop entirely
 					if (pomodoroState.currentSession >= pomodoroState.totalSessions) {
@@ -180,9 +197,18 @@ if (startPomodoroBtn) {
 						if (pomodoroDonutRing)
 							pomodoroDonutRing.style.strokeDashoffset = "0";
 
+						updateSessionCounter();
+						hideSessionCounter();
 						return;
 					}
 
+					// ✅ Move into break phase
+					startBreakPhase();
+					updatePomodoroDisplay();
+					return; // timer keeps running, next tick continues break
+				}
+
+				if (pomodoroState.phase === "break") {
 					// ✅ Otherwise, start the next focus phase
 					startFocusPhase();
 					updatePomodoroDisplay();
