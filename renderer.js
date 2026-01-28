@@ -81,6 +81,9 @@ if (startPomodoroBtn) {
 		pomodoroState.totalSessions =
 			Number.isFinite(totalSessions) && totalSessions > 0 ? totalSessions : 4;
 
+		// ✅ RESET SESSION COUNT HERE
+		pomodoroState.currentSession = 0;
+
 		// 🍅 POMODORO COUNTDOWN ENGINE (STEP 4)
 		if (pomodoroState.timerId) {
 			clearInterval(pomodoroState.timerId);
@@ -93,42 +96,108 @@ if (startPomodoroBtn) {
 		const totalFocusSeconds = pomodoroState.focusDurationSeconds;
 		const ringCircumference = 427;
 
+		const startFocusPhase = () => {
+			pomodoroState.phase = "focus";
+			pomodoroState.remainingSeconds = pomodoroState.focusDurationSeconds;
+		};
+
+		const startBreakPhase = () => {
+			pomodoroState.phase = "break";
+			pomodoroState.remainingSeconds = pomodoroState.breakDurationSeconds;
+		};
+
 		const updatePomodoroDisplay = () => {
+			// ✅ Convert remaining seconds into MM:SS
 			const minutes = Math.floor(pomodoroState.remainingSeconds / 60);
 			const seconds = pomodoroState.remainingSeconds % 60;
 			const timeLabel = `${padTime(minutes)}:${padTime(seconds)}`;
 
+			// ✅ Update the center time text
 			if (pomodoroTimeDisplay) {
 				pomodoroTimeDisplay.textContent = timeLabel;
 			}
 
+			// ✅ Update the phase label (FOCUS / BREAK / IDLE)
 			if (pomodoroPhaseLabel) {
-				pomodoroPhaseLabel.textContent = "FOCUS";
+				pomodoroPhaseLabel.textContent = pomodoroState.phase.toUpperCase();
 			}
 
+			// ✅ Donut progress should depend on the current phase duration
+			//    - Focus uses focusDurationSeconds
+			//    - Break uses breakDurationSeconds
+			let totalPhaseSeconds = pomodoroState.focusDurationSeconds;
+			if (pomodoroState.phase === "break") {
+				totalPhaseSeconds = pomodoroState.breakDurationSeconds;
+			}
+
+			// ✅ Avoid divide-by-zero (just in case)
+			if (totalPhaseSeconds <= 0) totalPhaseSeconds = 1;
+
+			// ✅ Progress ratio: 1.0 at start, 0.0 at end
+			const ratio = pomodoroState.remainingSeconds / totalPhaseSeconds;
+
+			// ✅ Convert ratio into strokeDashoffset
 			if (pomodoroDonutRing) {
-				const offset =
-					ringCircumference *
-					(pomodoroState.remainingSeconds / totalFocusSeconds);
+				const offset = ringCircumference * ratio;
 				pomodoroDonutRing.style.strokeDashoffset = String(offset);
 			}
 		};
 
 		updatePomodoroDisplay();
 
-		pomodoroState.timerId = setInterval(() => {
+		// ✅ A named tick function (stable + debuggable)
+		const tickPomodoro = () => {
+			// Step down 1 second
 			pomodoroState.remainingSeconds -= 1;
 
+			// If time is over for the current phase...
 			if (pomodoroState.remainingSeconds <= 0) {
 				pomodoroState.remainingSeconds = 0;
 				updatePomodoroDisplay();
-				clearInterval(pomodoroState.timerId);
-				pomodoroState.timerId = null;
-				return;
+
+				// 🔁 Phase switching (focus -> break -> focus ...)
+				if (pomodoroState.phase === "focus") {
+					// ✅ Move into break phase
+					startBreakPhase();
+					updatePomodoroDisplay();
+					return; // timer keeps running, next tick continues break
+				}
+
+				if (pomodoroState.phase === "break") {
+					// ✅ Completed one focus+break cycle (count a focus session)
+					pomodoroState.currentSession += 1;
+
+					// ✅ If we hit the session limit, stop entirely
+					if (pomodoroState.currentSession >= pomodoroState.totalSessions) {
+						clearInterval(pomodoroState.timerId);
+						pomodoroState.timerId = null;
+
+						// Keep state simple: idle + DONE
+						resetPomodoroState();
+
+						if (pomodoroTimeDisplay) pomodoroTimeDisplay.textContent = "DONE";
+						if (pomodoroPhaseLabel) pomodoroPhaseLabel.textContent = "IDLE";
+
+						// ✅ Reset donut ring to full circle when idle
+						if (pomodoroDonutRing)
+							pomodoroDonutRing.style.strokeDashoffset = "0";
+
+						return;
+					}
+
+					// ✅ Otherwise, start the next focus phase
+					startFocusPhase();
+					updatePomodoroDisplay();
+					return;
+				}
 			}
 
+			// Normal tick render
 			updatePomodoroDisplay();
-		}, 1000);
+		};
+
+		// ✅ Start ticking
+		pomodoroState.timerId = setInterval(tickPomodoro, 1000);
 
 		console.log("Pomodoro config captured:", {
 			focusMinutes,
