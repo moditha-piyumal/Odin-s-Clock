@@ -53,6 +53,7 @@ const startPomodoroBtn = document.getElementById("startPomodoroBtn");
 const pomodoroTimeDisplay = document.getElementById("pomodoroTimeDisplay");
 const pomodoroPhaseLabel = document.getElementById("pomodoroPhaseLabel");
 const pomodoroDonutRing = document.querySelector(".pomodoro-donut-ring");
+const pomodoroCancelBtn = document.getElementById("pomodoroCancelBtn");
 
 if (pomodoroTimeDisplay) {
 	pomodoroTimeDisplay.textContent = "25:00";
@@ -201,6 +202,33 @@ if (startPomodoroBtn) {
 			breakMinutes,
 			totalSessions,
 		});
+	});
+}
+
+if (pomodoroCancelBtn) {
+	pomodoroCancelBtn.addEventListener("click", () => {
+		if (pomodoroState.timerId) {
+			clearInterval(pomodoroState.timerId);
+			pomodoroState.timerId = null;
+		}
+
+		resetPomodoroState();
+
+		if (pomodoroTimeDisplay) {
+			const minutes = Math.floor(pomodoroState.focusDurationSeconds / 60);
+			const seconds = pomodoroState.focusDurationSeconds % 60;
+			pomodoroTimeDisplay.textContent = `${padTime(minutes)}:${padTime(seconds)}`;
+		}
+
+		if (pomodoroPhaseLabel) {
+			pomodoroPhaseLabel.textContent = "IDLE";
+		}
+
+		if (pomodoroDonutRing) {
+			pomodoroDonutRing.style.strokeDashoffset = "0";
+		}
+
+		window.windowControls?.unlockPomodoro?.();
 	});
 }
 
