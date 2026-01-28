@@ -7,6 +7,9 @@ let win = null;
 let tasksCache = [];
 let tasksFilePath;
 
+// 🔒 Pomodoro expansion lock
+let POMODORO_LOCK_EXPANDED = false;
+
 // ===============================
 // 🧱 WINDOW SIZE CONSTANTS
 // ===============================
@@ -17,7 +20,7 @@ const EXPANDED_HEIGHT = 950;
 // Shadow compensation (keeps visual edge tight)
 const SHADOW_OFFSET = 12;
 
-const DEV_DISABLE_AUTO_COLLAPSE = true; // DEV MODE: set to true to disable auto-collapse on blur
+const DEV_DISABLE_AUTO_COLLAPSE = false; // DEV MODE: set to true to disable auto-collapse on blur
 
 // ===============================
 // 🪟 CREATE WINDOW
@@ -79,7 +82,8 @@ function createWindow() {
 	// 🔽 COLLAPSE ON BLUR
 	// ===============================
 	win.on("blur", () => {
-		if (DEV_DISABLE_AUTO_COLLAPSE) return; // DEV MODE: disable auto-collapse
+		if (DEV_DISABLE_AUTO_COLLAPSE) return; // DEV MODE
+		if (POMODORO_LOCK_EXPANDED) return; // 🍅 Pomodoro lock
 		collapseWindow();
 	});
 }
@@ -134,6 +138,16 @@ ipcMain.on("window:expand", () => {
 
 ipcMain.on("window:collapse", () => {
 	collapseWindow();
+});
+
+// 🍅 Pomodoro expansion lock
+ipcMain.on("pomodoro:lock", () => {
+	POMODORO_LOCK_EXPANDED = true;
+	expandWindow(); // ensure visible
+});
+
+ipcMain.on("pomodoro:unlock", () => {
+	POMODORO_LOCK_EXPANDED = false;
 });
 
 // ================================

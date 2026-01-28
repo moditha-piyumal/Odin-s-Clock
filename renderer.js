@@ -1,4 +1,5 @@
 let isExpanded = false;
+let pomodoroLockExpanded = false;
 
 const generateId = () =>
 	crypto.randomUUID?.() || Math.random().toString(36).slice(2);
@@ -99,6 +100,7 @@ if (startPomodoroBtn) {
 		const startFocusPhase = () => {
 			pomodoroState.phase = "focus";
 			pomodoroState.remainingSeconds = pomodoroState.focusDurationSeconds;
+			window.api.send("pomodoro:lock");
 		};
 
 		const startBreakPhase = () => {
@@ -174,6 +176,7 @@ if (startPomodoroBtn) {
 
 						// Keep state simple: idle + DONE
 						resetPomodoroState();
+						window.api.send("pomodoro:unlock");
 
 						if (pomodoroTimeDisplay) pomodoroTimeDisplay.textContent = "DONE";
 						if (pomodoroPhaseLabel) pomodoroPhaseLabel.textContent = "IDLE";
