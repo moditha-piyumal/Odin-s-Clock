@@ -63,16 +63,35 @@
                         <button class="pomodoro-start-btn" id="startPomodoroBtn">Start Pomodoro</button>
                     </div>
                     <!-- 🍅 POMODORO DONUT UI (STEP 3) -->
-                    <div class="pomodoro-donut">
-                        <svg class="pomodoro-donut-svg" viewBox="0 0 160 160" aria-hidden="true">
-                            <circle class="pomodoro-donut-track" cx="80" cy="80" r="68" />
-                            <circle class="pomodoro-donut-ring" cx="80" cy="80" r="68" />
-                        </svg>
-                        <div class="pomodoro-donut-center">
-                            <span class="pomodoro-donut-time" id="pomodoroTimeDisplay">25:00</span>
-                            <span class="pomodoro-donut-phase" id="pomodoroPhaseLabel">IDLE</span>
+                    <div class="pomodoro-donut-wrapper">
+
+                        <!-- ❌ Cancel button (left / blue circle area) -->
+                        <div id="pomodoroCancelBtn" class="pomodoro-cancel-btn">
+                            Cancel
                         </div>
+
+                        <!-- 🍩 Donut -->
+                        <div class="pomodoro-donut">
+                            <svg class="pomodoro-donut-svg" viewBox="0 0 160 160" aria-hidden="true">
+                                <circle class="pomodoro-donut-track" cx="80" cy="80" r="68" />
+                                <circle class="pomodoro-donut-ring" cx="80" cy="80" r="68" />
+                            </svg>
+
+                            <div class="pomodoro-donut-center">
+                                <span class="pomodoro-donut-time" id="pomodoroTimeDisplay">25:00</span>
+                                <span class="pomodoro-donut-phase" id="pomodoroPhaseLabel">IDLE</span>
+                            </div>
+                        </div>
+
+                        <!-- 🔢 Session counter (right / red circle area) -->
+                        <div id="pomodoroSessionDisplay" class="pomodoro-session-display">
+                            <div class="session-label">Session</div>
+                            <div class="session-count">1 / 4</div>
+                        </div>
+
+
                     </div>
+
                 </div>
             </div>
         </div>
