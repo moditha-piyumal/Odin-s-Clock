@@ -537,6 +537,7 @@ const renderScheduledTasks = () => {
 
 		const label = document.createElement("span");
 		label.textContent = item.label;
+		label.title = item.task.name;
 
 		const doneBtn = document.createElement("button");
 		doneBtn.textContent = "Done";
