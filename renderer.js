@@ -62,7 +62,7 @@ const pomodoroSessionCount =
 
 const updateSessionCounter = () => {
 	if (!pomodoroSessionCount) return;
-	pomodoroSessionCount.textContent = `Session ${pomodoroState.currentSession} / ${pomodoroState.totalSessions}`;
+	pomodoroSessionCount.textContent = `${pomodoroState.currentSession} / ${pomodoroState.totalSessions}`;
 };
 
 const showSessionCounter = () => {
@@ -190,6 +190,7 @@ if (startPomodoroBtn) {
 					if (pomodoroState.currentSession >= pomodoroState.totalSessions) {
 						clearInterval(pomodoroState.timerId);
 						pomodoroState.timerId = null;
+						const completedSessions = pomodoroState.currentSession;
 
 						// Keep state simple: idle + DONE
 						resetPomodoroState();
@@ -205,7 +206,7 @@ if (startPomodoroBtn) {
 						// updateSessionCounter();
 						// hideSessionCounter();
 						if (pomodoroSessionCount) {
-							pomodoroSessionCount.textContent = "Sessions Complete";
+							pomodoroSessionCount.textContent = `${completedSessions} Complete`;
 						}
 
 						return;
