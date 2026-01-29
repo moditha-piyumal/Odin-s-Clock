@@ -228,31 +228,69 @@ if (startPomodoroBtn) {
 	});
 }
 
+function cancelPomodoro() {
+	// 1. Stop timer safely
+	if (pomodoroState.timerId) {
+		clearInterval(pomodoroState.timerId);
+		pomodoroState.timerId = null;
+	}
+
+	// 2. Reset core state
+	resetPomodoroState();
+
+	// 3. Reset UI text
+	if (pomodoroTimeDisplay) {
+		const minutes = Math.floor(pomodoroState.focusDurationSeconds / 60);
+		pomodoroTimeDisplay.textContent = `${padTime(minutes)}:00`;
+	}
+
+	if (pomodoroPhaseLabel) {
+		pomodoroPhaseLabel.textContent = "IDLE";
+	}
+
+	// 4. Reset donut ring (full circle)
+	if (pomodoroDonutRing) {
+		pomodoroDonutRing.style.strokeDashoffset = "0";
+	}
+
+	// 5. Hide & reset session counter UI
+	hideSessionCounter();
+
+	// 6. Unlock window collapse
+	window.windowControls?.unlockPomodoro?.();
+}
+
+// if (pomodoroCancelBtn) {
+// 	pomodoroCancelBtn.addEventListener("click", () => {
+// 		if (pomodoroState.timerId) {
+// 			clearInterval(pomodoroState.timerId);
+// 			pomodoroState.timerId = null;
+// 		}
+
+// 		resetPomodoroState();
+
+// 		if (pomodoroTimeDisplay) {
+// 			const minutes = Math.floor(pomodoroState.focusDurationSeconds / 60);
+// 			const seconds = pomodoroState.focusDurationSeconds % 60;
+// 			pomodoroTimeDisplay.textContent = `${padTime(minutes)}:${padTime(seconds)}`;
+// 		}
+
+// 		if (pomodoroPhaseLabel) {
+// 			pomodoroPhaseLabel.textContent = "IDLE";
+// 		}
+
+// 		if (pomodoroDonutRing) {
+// 			pomodoroDonutRing.style.strokeDashoffset = "0";
+// 		}
+
+// 		window.windowControls?.unlockPomodoro?.();
+// 		hideSessionCounter();
+// 	});
+// }
+
 if (pomodoroCancelBtn) {
 	pomodoroCancelBtn.addEventListener("click", () => {
-		if (pomodoroState.timerId) {
-			clearInterval(pomodoroState.timerId);
-			pomodoroState.timerId = null;
-		}
-
-		resetPomodoroState();
-
-		if (pomodoroTimeDisplay) {
-			const minutes = Math.floor(pomodoroState.focusDurationSeconds / 60);
-			const seconds = pomodoroState.focusDurationSeconds % 60;
-			pomodoroTimeDisplay.textContent = `${padTime(minutes)}:${padTime(seconds)}`;
-		}
-
-		if (pomodoroPhaseLabel) {
-			pomodoroPhaseLabel.textContent = "IDLE";
-		}
-
-		if (pomodoroDonutRing) {
-			pomodoroDonutRing.style.strokeDashoffset = "0";
-		}
-
-		window.windowControls?.unlockPomodoro?.();
-		hideSessionCounter();
+		cancelPomodoro();
 	});
 }
 
