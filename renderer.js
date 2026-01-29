@@ -62,8 +62,7 @@ const pomodoroSessionCount =
 
 const updateSessionCounter = () => {
 	if (!pomodoroSessionCount) return;
-	const currentSession = pomodoroState.currentSession + 1;
-	pomodoroSessionCount.textContent = `Session ${currentSession} / ${pomodoroState.totalSessions}`;
+	pomodoroSessionCount.textContent = `Session ${pomodoroState.currentSession} / ${pomodoroState.totalSessions}`;
 };
 
 const showSessionCounter = () => {
@@ -100,7 +99,7 @@ if (startPomodoroBtn) {
 			Number.isFinite(totalSessions) && totalSessions > 0 ? totalSessions : 4;
 
 		// ✅ RESET SESSION COUNT HERE
-		pomodoroState.currentSession = 0;
+		pomodoroState.currentSession = 1;
 		window.windowControls.lockPomodoro();
 		updateSessionCounter();
 		showSessionCounter();
@@ -177,10 +176,6 @@ if (startPomodoroBtn) {
 
 				// 🔁 Phase switching (focus -> break -> focus ...)
 				if (pomodoroState.phase === "focus") {
-					// ✅ Count focus session completion (focus -> break)
-					pomodoroState.currentSession += 1;
-					updateSessionCounter();
-
 					// ✅ If we hit the session limit, stop entirely
 					if (pomodoroState.currentSession >= pomodoroState.totalSessions) {
 						clearInterval(pomodoroState.timerId);
@@ -210,6 +205,8 @@ if (startPomodoroBtn) {
 
 				if (pomodoroState.phase === "break") {
 					// ✅ Otherwise, start the next focus phase
+					pomodoroState.currentSession += 1;
+					updateSessionCounter();
 					startFocusPhase();
 					updatePomodoroDisplay();
 					return;
@@ -255,6 +252,7 @@ if (pomodoroCancelBtn) {
 		}
 
 		window.windowControls?.unlockPomodoro?.();
+		hideSessionCounter();
 	});
 }
 
