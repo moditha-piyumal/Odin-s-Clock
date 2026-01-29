@@ -141,6 +141,16 @@ if (startPomodoroBtn) {
 				pomodoroPhaseLabel.textContent = pomodoroState.phase.toUpperCase();
 			}
 
+			if (pomodoroDonutRing) {
+				if (pomodoroState.phase === "focus") {
+					pomodoroDonutRing.style.stroke = "rgba(255, 160, 60, 0.95)"; // forge orange
+				} else if (pomodoroState.phase === "break") {
+					pomodoroDonutRing.style.stroke = "rgba(255, 109, 90, 0.9)"; // calm blue
+				} else {
+					pomodoroDonutRing.style.stroke = "rgba(255, 160, 60, 0.4)";
+				}
+			}
+
 			// ✅ Donut progress should depend on the current phase duration
 			//    - Focus uses focusDurationSeconds
 			//    - Break uses breakDurationSeconds
@@ -192,8 +202,12 @@ if (startPomodoroBtn) {
 						if (pomodoroDonutRing)
 							pomodoroDonutRing.style.strokeDashoffset = "0";
 
-						updateSessionCounter();
-						hideSessionCounter();
+						// updateSessionCounter();
+						// hideSessionCounter();
+						if (pomodoroSessionCount) {
+							pomodoroSessionCount.textContent = "Sessions Complete";
+						}
+
 						return;
 					}
 
