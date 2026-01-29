@@ -265,7 +265,9 @@ function cancelPomodoro() {
 
 	// 4. Reset donut ring (full circle)
 	if (pomodoroDonutRing) {
-		pomodoroDonutRing.style.strokeDashoffset = "0";
+		pomodoroDonutRing.style.strokeDashoffset = String(ringCircumference);
+
+		pomodoroDonutRing.style.stroke = "rgba(255, 200, 120, 0.6)";
 	}
 
 	// 5. Hide & reset session counter UI

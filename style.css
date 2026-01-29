@@ -165,8 +165,10 @@ body {
 .section {
     position: relative;
     /* 👈 important */
-    padding: 16px 0;
-    margin-top: 18px;
+    padding: 8px 0;
+    /* ↓ from 16px */
+    margin-top: 10px;
+    /* ↓ from 18px */
     font-size: 14px;
     opacity: 0.85;
 }
@@ -193,6 +195,8 @@ body {
     font-size: 13px;
     letter-spacing: 0.08em;
     text-shadow: 0 0 6px rgba(255, 150, 60, 0.25);
+    margin: 0 0 6px 0;
+    /* tight, intentional spacing */
 }
 
 /* ============================= */
@@ -200,10 +204,14 @@ body {
 /* ============================= */
 
 .pomodoro-config {
-    margin-top: 10px;
+    margin-top: 6px;
     display: grid;
-    gap: 10px;
+    gap: 6px;
     font-size: 12px;
+}
+
+.pomodoro-config label {
+    margin-bottom: 2px;
 }
 
 .pomodoro-field {
@@ -424,6 +432,13 @@ body {
 .scheduled-list {
     font-size: 13px;
     opacity: 0.8;
+    max-height: 180px;
+    /* adjust if needed */
+    overflow-y: auto;
+    padding-right: 4px;
+    /* space for scrollbar */
+    padding-bottom: 4px;
+    /* ↓ reduce visual dead space */
 }
 
 .scheduled-empty {
@@ -560,11 +575,19 @@ body {
     display: grid;
     grid-template-columns: 1fr auto auto;
     align-items: center;
-    column-gap: 10px;
+    gap: 6px;
+
     padding: 6px 0;
-    font-size: 13px;
-    opacity: 0.85;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    line-height: 1.2;
+
+    /* ✅ fixed button columns so every row matches */
+    grid-template-columns: 1fr 72px 72px;
+
+    align-items: center;
+    column-gap: 12px;
+
+    padding: 8px 0;
 }
 
 .scheduled-item span {
@@ -572,6 +595,9 @@ body {
     text-shadow: 0 0 4px rgba(255, 180, 90, 0.15);
     line-height: 1.3;
     word-break: break-word;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .scheduled-done-btn {
@@ -584,6 +610,8 @@ body {
         inset 0 0 6px rgba(255, 200, 120, 0.25),
         0 0 6px rgba(255, 160, 60, 0.25);
     opacity: 0.9;
+    padding: 3px 8px;
+    font-size: 11px;
 }
 
 .scheduled-done-btn:hover {
@@ -594,18 +622,7 @@ body {
 
 
 
-.scheduled-item {
 
-    display: grid;
-
-    /* ✅ fixed button columns so every row matches */
-    grid-template-columns: 1fr 72px 72px;
-
-    align-items: center;
-    column-gap: 12px;
-
-    padding: 8px 0;
-}
 
 .scheduled-item:last-child {
     margin-bottom: 0;
@@ -621,6 +638,8 @@ body {
         inset 0 0 6px rgba(255, 80, 80, 0.25),
         0 0 6px rgba(255, 60, 60, 0.2);
     opacity: 0.85;
+    padding: 3px 8px;
+    font-size: 11px;
 }
 
 .scheduled-delete-btn:hover {
