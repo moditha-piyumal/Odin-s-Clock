@@ -19,3 +19,8 @@ contextBridge.exposeInMainWorld("scheduledTasks", {
 		ipcRenderer.invoke("scheduledTasks:markDone", id, meta),
 	markDeleted: (id) => ipcRenderer.invoke("scheduledTasks:markDeleted", id),
 });
+
+contextBridge.exposeInMainWorld("fastingState", {
+	load: () => ipcRenderer.invoke("fasting:load"),
+	save: (state) => ipcRenderer.invoke("fasting:save", state),
+});

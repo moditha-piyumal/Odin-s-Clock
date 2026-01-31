@@ -6,6 +6,11 @@ let win = null;
 
 let tasksCache = [];
 let tasksFilePath;
+let fastingState = {
+	gapHours: null,
+	lastMealTime: null,
+};
+let fastingFilePath;
 
 // 🔒 Pomodoro expansion lock
 let POMODORO_LOCK_EXPANDED = false;
@@ -28,10 +33,15 @@ const DEV_DISABLE_AUTO_COLLAPSE = true; // DEV MODE: set to true to disable auto
 function createWindow() {
 	const userDataPath = app.getPath("userData");
 	tasksFilePath = path.join(userDataPath, "scheduled_tasks.json");
+	fastingFilePath = path.join(userDataPath, "fasting_state.json");
 
 	// Create file if it doesn't exist
 	if (!fs.existsSync(tasksFilePath)) {
 		fs.writeFileSync(tasksFilePath, JSON.stringify([], null, 2));
+	}
+
+	if (!fs.existsSync(fastingFilePath)) {
+		fs.writeFileSync(fastingFilePath, JSON.stringify(fastingState, null, 2));
 	}
 
 	// Load once into memory
@@ -41,6 +51,23 @@ function createWindow() {
 	} catch (err) {
 		console.error("Failed to load scheduled tasks:", err);
 		tasksCache = [];
+	}
+
+	try {
+		const raw = fs.readFileSync(fastingFilePath, "utf-8");
+		const parsed = JSON.parse(raw);
+		if (parsed && typeof parsed === "object") {
+			fastingState = {
+				gapHours:
+					Number.isFinite(parsed.gapHours) && parsed.gapHours > 0
+						? parsed.gapHours
+						: null,
+				lastMealTime: parsed.lastMealTime ?? null,
+			};
+		}
+	} catch (err) {
+		console.error("Failed to load fasting state:", err);
+		fastingState = { gapHours: null, lastMealTime: null };
 	}
 
 	const displays = screen.getAllDisplays();
@@ -193,6 +220,22 @@ ipcMain.handle("scheduledTasks:markDeleted", (event, taskId) => {
 	return tasksCache;
 });
 
+ipcMain.handle("fasting:load", () => {
+	return fastingState;
+});
+
+ipcMain.handle("fasting:save", (event, nextState) => {
+	if (nextState && typeof nextState === "object") {
+		fastingState = {
+			...fastingState,
+			...nextState,
+		};
+	}
+
+	saveFastingStateToDisk();
+	return fastingState;
+});
+
 // ===============================
 // 🚀 APP LIFECYCLE
 // ===============================
@@ -209,6 +252,14 @@ function saveTasksToDisk() {
 		fs.writeFileSync(tasksFilePath, JSON.stringify(tasksCache, null, 2));
 	} catch (err) {
 		console.error("Failed to save scheduled tasks:", err);
+	}
+}
+
+function saveFastingStateToDisk() {
+	try {
+		fs.writeFileSync(fastingFilePath, JSON.stringify(fastingState, null, 2));
+	} catch (err) {
+		console.error("Failed to save fasting state:", err);
 	}
 }
 

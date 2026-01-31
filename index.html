@@ -41,8 +41,19 @@
                     </div>
                 </div>
 
-                <div class="section">
-                    <h3>Intermittent Fasting (empty)</h3>
+                <div class="section" id="fastingSection">
+                    <h3>Intermittent Fasting</h3>
+                    <div class="fasting-config">
+                        <label class="fasting-field" for="fastingGapInput">
+                            Gap (hours)
+                            <input type="number" id="fastingGapInput" min="1" step="1" />
+                        </label>
+                        <div class="fasting-actions">
+                            <button id="fastingSetGapBtn">Set Gap</button>
+                            <button id="fastingAteBtn">I just ate!</button>
+                        </div>
+                        <div class="fasting-countdown" id="fastingCountdown">--:--</div>
+                    </div>
                 </div>
                 <div class="section" id="pomodoroSection">
                     <h3>Pomodoro</h3>
