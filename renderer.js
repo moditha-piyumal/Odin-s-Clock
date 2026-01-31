@@ -60,6 +60,11 @@ const pomodoroSessionDisplay = document.getElementById(
 const pomodoroSessionCount =
 	pomodoroSessionDisplay?.querySelector(".session-count") ?? null;
 
+const fastingGapInput = document.getElementById("fastingGapInput");
+const fastingSetGapBtn = document.getElementById("fastingSetGapBtn");
+const fastingAteBtn = document.getElementById("fastingAteBtn");
+const fastingCountdown = document.getElementById("fastingCountdown");
+
 const updateSessionCounter = () => {
 	if (!pomodoroSessionCount) return;
 	pomodoroSessionCount.textContent = `${pomodoroState.currentSession} / ${pomodoroState.totalSessions}`;
@@ -313,6 +318,81 @@ if (pomodoroCancelBtn) {
 
 const padTime = (value) => String(value).padStart(2, "0");
 
+let fastingState = {
+	gapHours: null,
+	lastMealTime: null,
+};
+
+const normalizeGapHours = (value) => {
+	const parsed = Number.parseInt(value, 10);
+	if (!Number.isFinite(parsed) || parsed <= 0) return null;
+	return parsed;
+};
+
+const renderFastingStatus = () => {
+	if (!fastingCountdown || !fastingAteBtn) return;
+
+	const gapHours = Number.isFinite(fastingState.gapHours)
+		? fastingState.gapHours
+		: null;
+	const lastMealTime = fastingState.lastMealTime;
+
+	let isFasting = false;
+	let displayValue = "--:--";
+
+	if (gapHours && lastMealTime) {
+		const lastMealDate = new Date(lastMealTime);
+		const lastMealMs = lastMealDate.getTime();
+
+		if (!Number.isNaN(lastMealMs)) {
+			const nextAllowedMs = lastMealMs + gapHours * 60 * 60 * 1000;
+			const remainingMs = nextAllowedMs - Date.now();
+
+			if (remainingMs > 0) {
+				const remainingMinutes = Math.ceil(remainingMs / 60_000);
+				const hours = Math.floor(remainingMinutes / 60);
+				const minutes = remainingMinutes % 60;
+				displayValue = `${padTime(hours)}:${padTime(minutes)}`;
+				isFasting = true;
+			} else {
+				displayValue = "Fasting complete";
+			}
+		}
+	}
+
+	fastingCountdown.textContent = displayValue;
+	fastingAteBtn.disabled = isFasting;
+};
+
+const saveFastingState = async (nextState) => {
+	if (!window.fastingState?.save) return;
+	fastingState = {
+		...fastingState,
+		...nextState,
+	};
+	await window.fastingState.save(fastingState);
+};
+
+const loadFastingState = async () => {
+	if (!window.fastingState?.load) return;
+	const stored = await window.fastingState.load();
+	if (stored && typeof stored === "object") {
+		fastingState = {
+			gapHours:
+				Number.isFinite(stored.gapHours) && stored.gapHours > 0
+					? stored.gapHours
+					: null,
+			lastMealTime: stored.lastMealTime ?? null,
+		};
+	}
+
+	if (fastingGapInput) {
+		fastingGapInput.value = fastingState.gapHours ?? "";
+	}
+
+	renderFastingStatus();
+};
+
 //Today helper
 // ✅ Local date helper (Sri Lanka / system local time)
 const getTodayLocalISO = () => {
@@ -437,9 +517,27 @@ document
 		closeModal();
 	});
 
+if (fastingSetGapBtn) {
+	fastingSetGapBtn.addEventListener("click", async () => {
+		const gapHours = normalizeGapHours(fastingGapInput?.value);
+		if (!gapHours) return;
+
+		await saveFastingState({ gapHours });
+		renderFastingStatus();
+	});
+}
+
+if (fastingAteBtn) {
+	fastingAteBtn.addEventListener("click", async () => {
+		await saveFastingState({ lastMealTime: new Date().toISOString() });
+		renderFastingStatus();
+	});
+}
+
 const scheduleClockUpdates = () => {
 	renderClock();
 	renderScheduledTasks(); // 👈 initial render sync
+	renderFastingStatus();
 
 	const now = new Date();
 	const msUntilNextMinute =
@@ -449,10 +547,12 @@ const scheduleClockUpdates = () => {
 		() => {
 			renderClock();
 			renderScheduledTasks(); // 👈 minute boundary sync
+			renderFastingStatus();
 
 			setInterval(() => {
 				renderClock();
 				renderScheduledTasks(); // 👈 every minute
+				renderFastingStatus();
 			}, 60_000);
 		},
 		Math.max(msUntilNextMinute, 0),
@@ -594,5 +694,6 @@ window.windowControls.onCollapsed(() => {
 	expandable.classList.add("collapsed");
 });
 
+loadFastingState();
 loadAndRenderScheduledTasks();
 scheduleClockUpdates();
