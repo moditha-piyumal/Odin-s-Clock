@@ -74,6 +74,7 @@ function createWindow() {
 		webPreferences: {
 			preload: __dirname + "/preload.js",
 		},
+		icon: path.join(__dirname, "assets/icon.ico"),
 	});
 
 	win.loadFile("index.html");
