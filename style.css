@@ -679,3 +679,91 @@ body {
         filter: blur(0px);
     }
 }
+
+/* ============================= */
+/* 🥗 INTERMITTENT FASTING UI */
+/* ============================= */
+
+.fasting-config {
+    display: grid;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 12px;
+}
+
+.fasting-field {
+    display: grid;
+    gap: 4px;
+    color: #ffcc88;
+    letter-spacing: 0.02em;
+}
+
+.fasting-field input {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 190, 90, 0.35);
+    background: rgba(0, 0, 0, 0.25);
+    color: #fff6e0;
+}
+
+.fasting-field input:focus {
+    outline: none;
+    border-color: rgba(255, 200, 110, 0.6);
+    box-shadow: 0 0 6px rgba(255, 160, 60, 0.2);
+}
+
+.fasting-set-btn {
+    margin-top: 4px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 180, 90, 0.35);
+    background: rgba(255, 180, 90, 0.15);
+    color: #ffe2b8;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+}
+
+.fasting-set-btn:hover {
+    background: rgba(255, 180, 90, 0.25);
+}
+
+/* 🍽️ Status row */
+.fasting-status {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px;
+}
+
+/* I just ate button */
+.fasting-ate-btn {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 180, 90, 0.35);
+    background: rgba(255, 160, 60, 0.18);
+    color: #ffe2b8;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.fasting-ate-btn:hover {
+    background: rgba(255, 180, 90, 0.3);
+}
+
+/* Countdown display */
+.fasting-countdown {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 190, 90, 0.35);
+    background: rgba(255, 170, 90, 0.1);
+    color: #ffcb80;
+    font-size: 12px;
+    text-align: center;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 4px rgba(255, 160, 60, 0.25);
+}
