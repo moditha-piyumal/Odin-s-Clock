@@ -1,11 +1,30 @@
 {
-	"name": "Odin's Clock",
+	"name": "odins-clock",
+	"productName": "Odin's Clock",
 	"version": "0.0.2",
+	"description": "A quiet, forge-themed desktop clock and focus companion.",
+	"author": "Moditha",
 	"main": "main.js",
 	"scripts": {
-		"start": "electron ."
+		"start": "electron .",
+		"build": "electron-builder"
 	},
 	"devDependencies": {
-		"electron": "^30.0.0"
+		"electron": "^30.0.0",
+		"electron-builder": "^24.13.3"
+	},
+	"build": {
+		"appId": "com.moditha.odinsclock",
+		"productName": "Odin's Clock",
+		"directories": {
+			"output": "dist"
+		},
+		"files": [
+			"**/*"
+		],
+		"win": {
+			"target": "nsis",
+			"icon": "assets/icon.ico"
+		}
 	}
 }
