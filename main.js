@@ -193,6 +193,33 @@ ipcMain.handle("scheduledTasks:markDeleted", (event, taskId) => {
 	return tasksCache;
 });
 
+// ================================
+// 📡 INTERMITTENT FASTING IPC
+// ================================
+
+const fastingFilePath = path.join(app.getPath("userData"), "fasting.json");
+
+ipcMain.handle("fasting:load", () => {
+	try {
+		if (!fs.existsSync(fastingFilePath)) return null;
+		const raw = fs.readFileSync(fastingFilePath, "utf-8");
+		return JSON.parse(raw);
+	} catch (err) {
+		console.error("Failed to load fasting state:", err);
+		return null;
+	}
+});
+
+ipcMain.handle("fasting:save", (event, data) => {
+	try {
+		fs.writeFileSync(fastingFilePath, JSON.stringify(data, null, 2));
+		return true;
+	} catch (err) {
+		console.error("Failed to save fasting state:", err);
+		return false;
+	}
+});
+
 // ===============================
 // 🚀 APP LIFECYCLE
 // ===============================

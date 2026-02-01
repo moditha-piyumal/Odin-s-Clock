@@ -633,24 +633,23 @@ const renderNextTask = (items) => {
 
 	nextTaskElement.textContent = `Next: ${nextItem.task.name} at ${timeLabel}`;
 };
-
 // =============================
-// 🥗 FASTING PERSISTENCE
+// 🥗 FASTING PERSISTENCE (FIXED)
 // =============================
 
 const saveFastingState = async () => {
-	if (!window.api?.saveFastingState) return;
+	if (!window.fasting?.save) return;
 
-	await window.api.saveFastingState({
+	await window.fasting.save({
 		gapHours: fastingState.gapHours,
 		endTime: fastingState.endTime,
 	});
 };
 
 const loadFastingState = async () => {
-	if (!window.api?.loadFastingState) return;
+	if (!window.fasting?.load) return;
 
-	const saved = await window.api.loadFastingState();
+	const saved = await window.fasting.load();
 	if (!saved) return;
 
 	fastingState.gapHours = saved.gapHours ?? null;
@@ -661,7 +660,9 @@ const loadFastingState = async () => {
 	}
 
 	const now = Date.now();
-	fastingState.isRunning = fastingState.endTime && fastingState.endTime > now;
+	fastingState.isRunning = !!(
+		fastingState.endTime && fastingState.endTime > now
+	);
 
 	renderFastingCountdown();
 	syncFastingButtons();
@@ -742,4 +743,5 @@ window.windowControls.onCollapsed(() => {
 });
 
 loadAndRenderScheduledTasks();
+loadFastingState();
 scheduleClockUpdates();
