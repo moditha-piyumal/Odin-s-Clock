@@ -67,6 +67,37 @@ const pomodoroSessionDisplay = document.getElementById(
 );
 const pomodoroSessionCount =
 	pomodoroSessionDisplay?.querySelector(".session-count") ?? null;
+const quietPresenceEl = document.getElementById("quietPresence");
+
+const quietPresenceMessages = [
+	"Stand fast. Time will bend.",
+	"The forge is warm. Begin.",
+	"One task. One strike.",
+	"Odin watches the patient hand.",
+	"Steel is shaped slowly.",
+	"Finish what you touch.",
+	"Silence sharpens focus.",
+	"Even gods wait.",
+	"The long road is walked one step.",
+	"Hold the line.",
+	"What is begun must be seen through.",
+	"Strength favors the steady.",
+	"The hammer rests. You do not.",
+	"No rush. No retreat.",
+	"Discipline outlives fire.",
+	"Eyes forward. Hands steady.",
+	"The forge rewards calm.",
+	"Today is shaped now.",
+	"Patience is power.",
+	"Endure. Then endure again.",
+];
+
+if (quietPresenceEl) {
+	const messageIndex = Math.floor(
+		Math.random() * quietPresenceMessages.length,
+	);
+	quietPresenceEl.textContent = quietPresenceMessages[messageIndex];
+}
 
 const updateSessionCounter = () => {
 	if (!pomodoroSessionCount) return;
