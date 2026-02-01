@@ -44,6 +44,14 @@ const oneDateInput = document.getElementById("oneTimeTaskDate");
 const oneTimeInput = document.getElementById("oneTimeTaskTime");
 const oneError = document.getElementById("oneTimeTaskError");
 
+// =============================
+// 🥗 INTERMITTENT FASTING UI (STEP 1)
+// =============================
+const fastingGapInput = document.getElementById("fastingGapHours");
+const setFastingGapBtn = document.getElementById("setFastingGapBtn");
+const fastingAteBtn = document.getElementById("fastingAteBtn");
+const fastingCountdownEl = document.getElementById("fastingCountdown");
+
 // 🍅 POMODORO CONFIG UI (STEP 2)
 const pomodoroFocusInput = document.getElementById("pomodoroFocusMinutes");
 const pomodoroBreakInput = document.getElementById("pomodoroBreakMinutes");
@@ -81,6 +89,10 @@ if (pomodoroTimeDisplay) {
 
 if (pomodoroPhaseLabel) {
 	pomodoroPhaseLabel.textContent = "IDLE";
+}
+
+if (fastingCountdownEl) {
+	fastingCountdownEl.textContent = "--:--";
 }
 
 if (startPomodoroBtn) {
@@ -305,6 +317,60 @@ function cancelPomodoro() {
 // 	});
 // }
 
+// =============================
+// 🥗 INTERMITTENT FASTING STATE (STEP 1)
+// =============================
+const fastingState = {
+	gapHours: null,
+	endTime: null,
+	isRunning: false,
+};
+
+const formatMinutesRemaining = (msRemaining) => {
+	if (msRemaining <= 0) return "00:00";
+	const totalMinutes = Math.ceil(msRemaining / 60000);
+	const hours = Math.floor(totalMinutes / 60);
+	const minutes = totalMinutes % 60;
+	return `${padTime(hours)}:${padTime(minutes)}`;
+};
+
+if (setFastingGapBtn && fastingGapInput) {
+	setFastingGapBtn.addEventListener("click", () => {
+		const hours = Number(fastingGapInput.value);
+
+		if (!Number.isInteger(hours) || hours <= 0) return;
+
+		fastingState.gapHours = hours;
+		saveFastingState();
+
+		console.log("Fasting gap set:", hours, "hours");
+	});
+}
+
+if (fastingAteBtn) {
+	fastingAteBtn.addEventListener("click", () => {
+		if (!fastingState.gapHours) return;
+
+		const now = Date.now();
+		const gapMs = fastingState.gapHours * 60 * 60 * 1000;
+
+		fastingState.endTime = now + gapMs;
+		// fastingState.isRunning = true;
+
+		if (fastingCountdownEl) {
+			fastingCountdownEl.textContent = formatMinutesRemaining(
+				fastingState.endTime - now,
+			);
+		}
+		fastingState.isRunning = true;
+		saveFastingState();
+		syncFastingButtons();
+		renderFastingCountdown();
+
+		console.log("Fasting started. Ends at:", new Date(fastingState.endTime));
+	});
+}
+//--------------------
 if (pomodoroCancelBtn) {
 	pomodoroCancelBtn.addEventListener("click", () => {
 		cancelPomodoro();
@@ -439,7 +505,8 @@ document
 
 const scheduleClockUpdates = () => {
 	renderClock();
-	renderScheduledTasks(); // 👈 initial render sync
+	renderScheduledTasks();
+	renderFastingCountdown(); // 👈 ADD
 
 	const now = new Date();
 	const msUntilNextMinute =
@@ -448,11 +515,13 @@ const scheduleClockUpdates = () => {
 	setTimeout(
 		() => {
 			renderClock();
-			renderScheduledTasks(); // 👈 minute boundary sync
+			renderScheduledTasks();
+			renderFastingCountdown(); // 👈 ADD
 
 			setInterval(() => {
 				renderClock();
-				renderScheduledTasks(); // 👈 every minute
+				renderScheduledTasks();
+				renderFastingCountdown(); // 👈 ADD
 			}, 60_000);
 		},
 		Math.max(msUntilNextMinute, 0),
@@ -503,6 +572,51 @@ const getScheduledItems = () => {
 	return items;
 };
 
+// Render Fasting Countdown
+
+const renderFastingCountdown = () => {
+	if (!fastingState.isRunning || !fastingState.endTime) {
+		if (fastingCountdownEl) {
+			fastingCountdownEl.textContent = "--:--";
+		}
+		return;
+	}
+
+	const now = Date.now();
+	const remainingMs = fastingState.endTime - now;
+
+	if (remainingMs <= 0) {
+		fastingState.isRunning = false;
+		fastingState.endTime = null;
+
+		if (fastingCountdownEl) {
+			fastingCountdownEl.textContent = "00:00";
+		}
+		saveFastingState();
+		syncFastingButtons(); // 👈 re-enable buttons
+		return;
+	}
+
+	if (fastingCountdownEl) {
+		fastingCountdownEl.textContent = formatMinutesRemaining(remainingMs);
+	}
+};
+
+const syncFastingButtons = () => {
+	if (!fastingAteBtn || !setFastingGapBtn) return;
+
+	const disabled = fastingState.isRunning === true;
+
+	fastingAteBtn.disabled = disabled;
+	setFastingGapBtn.disabled = disabled;
+
+	// Optional: visual cue via CSS
+	fastingAteBtn.classList.toggle("disabled", disabled);
+	setFastingGapBtn.classList.toggle("disabled", disabled);
+};
+
+syncFastingButtons();
+
 const renderNextTask = (items) => {
 	if (!nextTaskElement) return;
 
@@ -518,6 +632,39 @@ const renderNextTask = (items) => {
 	});
 
 	nextTaskElement.textContent = `Next: ${nextItem.task.name} at ${timeLabel}`;
+};
+
+// =============================
+// 🥗 FASTING PERSISTENCE
+// =============================
+
+const saveFastingState = async () => {
+	if (!window.api?.saveFastingState) return;
+
+	await window.api.saveFastingState({
+		gapHours: fastingState.gapHours,
+		endTime: fastingState.endTime,
+	});
+};
+
+const loadFastingState = async () => {
+	if (!window.api?.loadFastingState) return;
+
+	const saved = await window.api.loadFastingState();
+	if (!saved) return;
+
+	fastingState.gapHours = saved.gapHours ?? null;
+	fastingState.endTime = saved.endTime ?? null;
+
+	if (fastingGapInput && fastingState.gapHours) {
+		fastingGapInput.value = fastingState.gapHours;
+	}
+
+	const now = Date.now();
+	fastingState.isRunning = fastingState.endTime && fastingState.endTime > now;
+
+	renderFastingCountdown();
+	syncFastingButtons();
 };
 
 const renderScheduledTasks = () => {
