@@ -586,17 +586,49 @@ const getScheduledItems = () => {
 		}
 
 		if (task.type === "daily") {
-			// 🚫 Skip if already done today
-			if (task.lastDoneDate === getTodayLocalISO()) {
+			const todayISO = getTodayLocalISO();
+
+			// ✅ If done today, nothing to show (same behavior as now)
+			if (task.lastDoneDate === todayISO) {
 				continue;
 			}
 
-			const nextDt = getNextDailyDateTime(task);
+			const now = getNow();
+			const todayDt = getTodayDailyDateTime(task);
 
+			// ✅ If today's occurrence already passed and it's not done → show overdue "today" item
+			if (todayDt <= now) {
+				items.push({
+					task,
+					dateTime: todayDt, // past time -> sorts above tomorrow
+					isOverdue: true,
+					label: `${task.name} – Today ${todayDt.toLocaleTimeString([], {
+						hour: "2-digit",
+						minute: "2-digit",
+					})}`,
+				});
+
+				// ✅ Also show the next repetition (tomorrow)
+				const tomorrowDt = getNextDailyDateTime(task); // this returns tomorrow when todayDt <= now
+				items.push({
+					task,
+					dateTime: tomorrowDt,
+					isOverdue: false,
+					label: `${task.name} – Next ${tomorrowDt.toLocaleTimeString([], {
+						hour: "2-digit",
+						minute: "2-digit",
+					})}`,
+				});
+
+				continue; // important: avoid pushing a duplicate "next" below
+			}
+
+			// ✅ Otherwise, today's occurrence is still upcoming → show it normally
 			items.push({
 				task,
-				dateTime: nextDt,
-				label: `${task.name} – ${nextDt.toLocaleTimeString([], {
+				dateTime: todayDt,
+				isOverdue: false,
+				label: `${task.name} – ${todayDt.toLocaleTimeString([], {
 					hour: "2-digit",
 					minute: "2-digit",
 				})}`,
@@ -663,7 +695,9 @@ const renderNextTask = (items) => {
 		return;
 	}
 
-	const nextItem = items[0];
+	const now = getNow();
+	const nextItem = items.find((it) => it.dateTime > now) || items[0];
+
 	const timeLabel = nextItem.dateTime.toLocaleTimeString([], {
 		hour: "2-digit",
 		minute: "2-digit",
