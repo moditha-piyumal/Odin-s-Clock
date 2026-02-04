@@ -93,9 +93,7 @@ const quietPresenceMessages = [
 ];
 
 if (quietPresenceEl) {
-	const messageIndex = Math.floor(
-		Math.random() * quietPresenceMessages.length,
-	);
+	const messageIndex = Math.floor(Math.random() * quietPresenceMessages.length);
 	quietPresenceEl.textContent = quietPresenceMessages[messageIndex];
 }
 
@@ -436,6 +434,14 @@ const getNextDailyDateTime = (task) => {
 	tomorrow.setDate(today.getDate() + 1);
 	return tomorrow;
 };
+const getTodayDailyDateTime = (task) => {
+	const now = getNow();
+	const [hh, mm] = task.time.split(":").map(Number);
+
+	const today = new Date(now);
+	today.setHours(hh, mm, 0, 0);
+	return today;
+};
 
 // Modal Helpers
 const modalOverlay = document.getElementById("scheduleModalOverlay");
@@ -569,13 +575,14 @@ const getScheduledItems = () => {
 			if (task.done) continue;
 
 			const dt = new Date(`${task.date}T${task.time}`);
-			if (dt > now) {
-				items.push({
-					task,
-					dateTime: dt,
-					label: `${task.name} – ${task.date} ${task.time}`,
-				});
-			}
+			const isOverdue = dt <= now;
+
+			items.push({
+				task,
+				dateTime: dt,
+				isOverdue,
+				label: `${task.name} – ${task.date} ${task.time}`,
+			});
 		}
 
 		if (task.type === "daily") {
@@ -713,6 +720,10 @@ const renderScheduledTasks = () => {
 	for (const item of items) {
 		const el = document.createElement("div");
 		el.className = "scheduled-item";
+
+		if (item.isOverdue) {
+			el.classList.add("scheduled-overdue");
+		}
 
 		const label = document.createElement("span");
 		label.textContent = item.label;

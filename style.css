@@ -453,6 +453,20 @@ body {
     margin-bottom: 8px;
 }
 
+/* 🔴 Overdue scheduled task */
+.scheduled-item.scheduled-overdue {
+    border-left: 3px solid rgba(220, 80, 60, 0.9);
+    padding-left: 9px;
+    background: linear-gradient(to right,
+            rgba(120, 30, 30, 0.18),
+            rgba(0, 0, 0, 0));
+}
+
+.scheduled-item.scheduled-overdue span {
+    color: #ffb0a0;
+    text-shadow: 0 0 6px rgba(200, 80, 60, 0.35);
+}
+
 /* ============================= */
 /* ➕ ADD SCHEDULED TASK BUTTON */
 /* ============================= */
