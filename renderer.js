@@ -69,6 +69,40 @@ const pomodoroSessionCount =
 	pomodoroSessionDisplay?.querySelector(".session-count") ?? null;
 const quietPresenceEl = document.getElementById("quietPresence");
 
+// =============================
+// 🔊 AMBIENT SOUND (FORGE)
+// =============================
+let ambientAudio = null;
+
+const initAmbientAudio = () => {
+	if (ambientAudio) return;
+
+	ambientAudio = new Audio("assets/ambient-forge.mp3"); // or .wav
+	ambientAudio.loop = true;
+	ambientAudio.volume = 0.55; // start low; adjust later
+};
+
+const playAmbient = () => {
+	initAmbientAudio();
+	if (!ambientAudio) return;
+
+	// Avoid restarting if already playing
+	if (!ambientAudio.paused) return;
+
+	ambientAudio.currentTime = 0;
+	ambientAudio.play().catch(() => {
+		// Autoplay may fail until user interaction (safe to ignore)
+	});
+};
+
+const stopAmbient = () => {
+	if (!ambientAudio) return;
+
+	ambientAudio.pause();
+	ambientAudio.currentTime = 0;
+};
+// =============================
+
 const quietPresenceMessages = [
 	"Stand fast. Time will bend.",
 	"The forge is warm. Begin.",
@@ -587,51 +621,46 @@ const getScheduledItems = () => {
 
 		if (task.type === "daily") {
 			const todayISO = getTodayLocalISO();
-
-			// ✅ If done today, nothing to show (same behavior as now)
-			if (task.lastDoneDate === todayISO) {
-				continue;
-			}
+			const doneToday = task.lastDoneDate === todayISO;
 
 			const now = getNow();
 			const todayDt = getTodayDailyDateTime(task);
 
-			// ✅ If today's occurrence already passed and it's not done → show overdue "today" item
-			if (todayDt <= now) {
+			// 🟥 Missed today (not done, time passed)
+			if (!doneToday && todayDt <= now) {
+				// Overdue "today"
 				items.push({
 					task,
-					dateTime: todayDt, // past time -> sorts above tomorrow
+					dateTime: todayDt,
 					isOverdue: true,
 					label: `${task.name} – Today ${todayDt.toLocaleTimeString([], {
 						hour: "2-digit",
 						minute: "2-digit",
 					})}`,
 				});
-
-				// ✅ Also show the next repetition (tomorrow)
-				const tomorrowDt = getNextDailyDateTime(task); // this returns tomorrow when todayDt <= now
-				items.push({
-					task,
-					dateTime: tomorrowDt,
-					isOverdue: false,
-					label: `${task.name} – Next ${tomorrowDt.toLocaleTimeString([], {
-						hour: "2-digit",
-						minute: "2-digit",
-					})}`,
-				});
-
-				continue; // important: avoid pushing a duplicate "next" below
 			}
 
-			// ✅ Otherwise, today's occurrence is still upcoming → show it normally
+			// ✅ Always show the next occurrence unless task is deleted
+			const nextDt = getNextDailyDateTime(task);
+
 			items.push({
 				task,
-				dateTime: todayDt,
+				dateTime: nextDt,
 				isOverdue: false,
-				label: `${task.name} – ${todayDt.toLocaleTimeString([], {
-					hour: "2-digit",
-					minute: "2-digit",
-				})}`,
+				label: doneToday
+					? `${task.name} – Next ${nextDt.toLocaleTimeString([], {
+							hour: "2-digit",
+							minute: "2-digit",
+						})}`
+					: todayDt > now
+						? `${task.name} – ${todayDt.toLocaleTimeString([], {
+								hour: "2-digit",
+								minute: "2-digit",
+							})}`
+						: `${task.name} – Next ${nextDt.toLocaleTimeString([], {
+								hour: "2-digit",
+								minute: "2-digit",
+							})}`,
 			});
 		}
 	}
@@ -810,12 +839,16 @@ document.addEventListener("click", () => {
 	isExpanded = true;
 	window.windowControls.expand();
 	expandable.classList.remove("collapsed");
+
+	playAmbient(); // 🔊 start forge ambience
 });
 
 // 🔁 Listen for collapse from main process
 window.windowControls.onCollapsed(() => {
 	isExpanded = false;
 	expandable.classList.add("collapsed");
+
+	stopAmbient(); // 🔇 silence on collapse
 });
 
 loadAndRenderScheduledTasks();
