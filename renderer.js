@@ -162,6 +162,21 @@ const playFastingAteSound = () => {
 	});
 };
 
+// =============================
+// 🗑️ TASK DELETE SOUND
+// =============================
+const taskDeleteSound = new Audio("assets/task-delete.mp3");
+
+taskDeleteSound.volume = 0.4;
+taskDeleteSound.preload = "auto";
+
+const playTaskDeleteSound = () => {
+	taskDeleteSound.currentTime = 0;
+	taskDeleteSound.play().catch(() => {
+		// Ignore autoplay restrictions
+	});
+};
+
 const quietPresenceMessages = [
 	"Stand fast. Time will bend.",
 	"The forge is warm. Begin.",
@@ -873,6 +888,7 @@ const renderScheduledTasks = () => {
 		doneBtn.className = "scheduled-done-btn";
 
 		doneBtn.addEventListener("click", async () => {
+			playUIClick(); // 🔘 UI click
 			if (item.task.type === "daily") {
 				await window.scheduledTasks.markDone(item.task.id, {
 					date: getTodayLocalISO(),
@@ -891,6 +907,8 @@ const renderScheduledTasks = () => {
 		deleteBtn.className = "scheduled-delete-btn";
 
 		deleteBtn.addEventListener("click", async () => {
+			playTaskDeleteSound();
+
 			await window.scheduledTasks.markDeleted(item.task.id);
 			await loadAndRenderScheduledTasks();
 		});

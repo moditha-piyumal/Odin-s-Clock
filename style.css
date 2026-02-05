@@ -719,7 +719,12 @@ body {
             rgba(255, 150, 50, 0.35));
 }
 
-
+/* ✅ Task marked as done (temporary visual state) */
+.scheduled-item.scheduled-done {
+    opacity: 0.45;
+    text-decoration: line-through;
+    filter: grayscale(0.4);
+}
 
 
 
