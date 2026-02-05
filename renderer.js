@@ -69,6 +69,9 @@ const pomodoroSessionCount =
 	pomodoroSessionDisplay?.querySelector(".session-count") ?? null;
 const quietPresenceEl = document.getElementById("quietPresence");
 
+// ✅ Pomodoro donut ring circumference (shared by start + cancel)
+const POMODORO_RING_CIRCUMFERENCE = 427;
+
 // =============================
 // 🔊 AMBIENT SOUND (FORGE)
 // =============================
@@ -102,6 +105,32 @@ const stopAmbient = () => {
 	ambientAudio.currentTime = 0;
 };
 // =============================
+
+// =============================
+// 🔔 POMODORO SOUND CUES
+// =============================
+const pomodoroSounds = {
+	focusStart: new Audio("assets/pomodoro-focus-start.mp3"),
+	breakStart: new Audio("assets/pomodoro-break-start.mp3"),
+	done: new Audio("assets/pomodoro-done.mp3"),
+	cancel: new Audio("assets/pomodoro-cancel.mp3"),
+};
+
+// Slightly louder than ambience
+Object.values(pomodoroSounds).forEach((audio) => {
+	audio.volume = 0.6;
+	audio.preload = "auto";
+});
+
+function playPomodoroCue(type) {
+	const audio = pomodoroSounds[type];
+	if (!audio) return;
+
+	audio.currentTime = 0;
+	audio.play().catch(() => {
+		// Ignore autoplay restrictions
+	});
+}
 
 const quietPresenceMessages = [
 	"Stand fast. Time will bend.",
@@ -187,8 +216,10 @@ if (startPomodoroBtn) {
 
 		pomodoroState.phase = "focus";
 		pomodoroState.remainingSeconds = pomodoroState.focusDurationSeconds;
+		stopAmbient(); // 🔇 stop forge ambience
+		playPomodoroCue("focusStart"); // 🔔 focus start cue
 
-		const ringCircumference = 427;
+		const ringCircumference = POMODORO_RING_CIRCUMFERENCE;
 
 		const startFocusPhase = () => {
 			pomodoroState.phase = "focus";
@@ -270,6 +301,8 @@ if (startPomodoroBtn) {
 						// Keep state simple: idle + DONE
 						resetPomodoroState();
 						window.windowControls.unlockPomodoro();
+						playPomodoroCue("done"); // 🔔 all sessions complete
+						playAmbient(); // 🔊 resume forge ambience
 
 						if (pomodoroTimeDisplay) pomodoroTimeDisplay.textContent = "DONE";
 						if (pomodoroPhaseLabel) pomodoroPhaseLabel.textContent = "IDLE";
@@ -289,6 +322,8 @@ if (startPomodoroBtn) {
 
 					// ✅ Move into break phase
 					startBreakPhase();
+					playPomodoroCue("breakStart");
+
 					updatePomodoroDisplay();
 					return; // timer keeps running, next tick continues break
 				}
@@ -298,6 +333,7 @@ if (startPomodoroBtn) {
 					pomodoroState.currentSession += 1;
 					updateSessionCounter();
 					startFocusPhase();
+					playPomodoroCue("focusStart"); // 🔔 CALL BACK TO WORK (break → focus)
 					updatePomodoroDisplay();
 					return;
 				}
@@ -340,7 +376,9 @@ function cancelPomodoro() {
 
 	// 4. Reset donut ring (full circle)
 	if (pomodoroDonutRing) {
-		pomodoroDonutRing.style.strokeDashoffset = String(ringCircumference);
+		pomodoroDonutRing.style.strokeDashoffset = String(
+			POMODORO_RING_CIRCUMFERENCE,
+		);
 
 		pomodoroDonutRing.style.stroke = "rgba(255, 200, 120, 0.6)";
 	}
@@ -350,6 +388,11 @@ function cancelPomodoro() {
 
 	// 6. Unlock window collapse
 	window.windowControls?.unlockPomodoro?.();
+	playPomodoroCue("cancel"); // 🔔 cancel cue
+
+	if (isExpanded) {
+		playAmbient(); // 🔊 restore ambience if still expanded
+	}
 }
 
 // if (pomodoroCancelBtn) {
