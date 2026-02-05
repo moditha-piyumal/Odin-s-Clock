@@ -132,6 +132,36 @@ function playPomodoroCue(type) {
 	});
 }
 
+// =============================
+// 🔘 UI BUTTON CLICK SOUND
+// =============================
+const uiClickSound = new Audio("assets/ui-click.mp3");
+
+uiClickSound.volume = 0.35; // softer than pomodoro cues
+uiClickSound.preload = "auto";
+
+const playUIClick = () => {
+	uiClickSound.currentTime = 0;
+	uiClickSound.play().catch(() => {
+		// Ignore autoplay restrictions
+	});
+};
+
+// =============================
+// 🍽️ FASTING "ATE" SOUND
+// =============================
+const fastingAteSound = new Audio("assets/fasting-ate.mp3");
+
+fastingAteSound.volume = 0.45; // slightly stronger than normal UI click
+fastingAteSound.preload = "auto";
+
+const playFastingAteSound = () => {
+	fastingAteSound.currentTime = 0;
+	fastingAteSound.play().catch(() => {
+		// Ignore autoplay restrictions
+	});
+};
+
 const quietPresenceMessages = [
 	"Stand fast. Time will bend.",
 	"The forge is warm. Begin.",
@@ -442,6 +472,7 @@ const formatMinutesRemaining = (msRemaining) => {
 
 if (setFastingGapBtn && fastingGapInput) {
 	setFastingGapBtn.addEventListener("click", () => {
+		playUIClick(); // 🔘 UI click
 		const hours = Number(fastingGapInput.value);
 
 		if (!Number.isInteger(hours) || hours <= 0) return;
@@ -455,6 +486,8 @@ if (setFastingGapBtn && fastingGapInput) {
 
 if (fastingAteBtn) {
 	fastingAteBtn.addEventListener("click", () => {
+		playFastingAteSound(); // 🍽️ meal logged
+
 		if (!fastingState.gapHours) return;
 
 		const now = Date.now();
