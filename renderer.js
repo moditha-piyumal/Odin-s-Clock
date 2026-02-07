@@ -636,6 +636,11 @@ document
 			name: dailyNameInput.value.trim(),
 			time: dailyTimeInput.value,
 			createdAt: new Date().toISOString(),
+
+			// ✅ NEW: store multiple completed days
+			doneDates: {},
+
+			// ✅ Keep for backward compatibility (optional, but helpful)
 			lastDoneDate: null,
 		};
 
@@ -719,10 +724,31 @@ const getScheduledItems = () => {
 
 		if (task.type === "daily") {
 			const todayISO = getTodayLocalISO();
-			const doneToday = task.lastDoneDate === todayISO;
+			const doneToday = !!task.doneDates?.[todayISO];
 
 			const now = getNow();
 			const todayDt = getTodayDailyDateTime(task);
+
+			// Missed yesterday (not done, time passed)
+			// 🔴 Missed yesterday (even if app was closed)
+			const yesterdayDt = new Date(todayDt);
+			yesterdayDt.setDate(yesterdayDt.getDate() - 1);
+
+			const yesterdayISO = getLocalISOFromDate(yesterdayDt);
+			const doneYesterday = !!task.doneDates?.[yesterdayISO];
+
+			if (!doneYesterday && yesterdayDt <= now) {
+				items.push({
+					task,
+					dateTime: yesterdayDt,
+					instanceDate: yesterdayISO,
+					isOverdue: true,
+					label: `${task.name} – ${yesterdayDt.toLocaleTimeString([], {
+						hour: "2-digit",
+						minute: "2-digit",
+					})}`,
+				});
+			}
 
 			// 🟥 Missed today (not done, time passed)
 			if (!doneToday && todayDt <= now) {

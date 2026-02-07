@@ -38,6 +38,26 @@ function createWindow() {
 	try {
 		const raw = fs.readFileSync(tasksFilePath, "utf-8");
 		tasksCache = JSON.parse(raw);
+		// This part is not absolutely needed
+		// ✅ Migration: ensure daily tasks have doneDates map
+		tasksCache = (tasksCache || []).map((t) => {
+			if (t?.type !== "daily") return t;
+
+			// Create doneDates if missing
+			if (!t.doneDates) t.doneDates = {};
+
+			// If old data used lastDoneDate, migrate it into doneDates
+			if (t.lastDoneDate && !t.doneDates[t.lastDoneDate]) {
+				t.doneDates[t.lastDoneDate] = true;
+			}
+
+			return t;
+		});
+
+		// Persist migration so it doesn't repeat every launch
+		saveTasksToDisk();
+
+		// but it ensures any malformed data doesn't break the app
 	} catch (err) {
 		console.error("Failed to load scheduled tasks:", err);
 		tasksCache = [];
@@ -175,8 +195,14 @@ ipcMain.handle("scheduledTasks:markDone", (event, taskId, meta = {}) => {
 	}
 
 	if (task.type === "daily") {
-		task.lastDoneDate = meta.date;
-		task.lastDoneAt = new Date().toISOString();
+		const dateKey = meta.date; // expects "YYYY-MM-DD"
+		if (!task.doneDates) task.doneDates = {};
+
+		if (dateKey) {
+			task.doneDates[dateKey] = true; // ✅ supports multiple done days
+			task.lastDoneDate = dateKey; // optional: keep "latest"
+			task.lastDoneAt = new Date().toISOString();
+		}
 	}
 
 	saveTasksToDisk();
