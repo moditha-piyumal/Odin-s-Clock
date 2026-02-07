@@ -543,6 +543,13 @@ const getTodayLocalISO = () => {
 	return `${y}-${m}-${day}`; // YYYY-MM-DD (local)
 };
 
+const getLocalISOFromDate = (date) => {
+	const y = date.getFullYear();
+	const m = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	return `${y}-${m}-${day}`; // YYYY-MM-DD (local)
+};
+
 const scheduledList = document.getElementById("scheduledTasksList");
 let scheduledTasksCache = [];
 const getNow = () => new Date();
@@ -723,6 +730,7 @@ const getScheduledItems = () => {
 				items.push({
 					task,
 					dateTime: todayDt,
+					instanceDate: getLocalISOFromDate(todayDt),
 					isOverdue: true,
 					label: `${task.name} – Today ${todayDt.toLocaleTimeString([], {
 						hour: "2-digit",
@@ -737,6 +745,7 @@ const getScheduledItems = () => {
 			items.push({
 				task,
 				dateTime: nextDt,
+				instanceDate: getLocalISOFromDate(nextDt),
 				isOverdue: false,
 				label: doneToday
 					? `${task.name} – Next ${nextDt.toLocaleTimeString([], {
@@ -890,8 +899,10 @@ const renderScheduledTasks = () => {
 		doneBtn.addEventListener("click", async () => {
 			playUIClick(); // 🔘 UI click
 			if (item.task.type === "daily") {
+				const instanceDate =
+					item.instanceDate ?? getLocalISOFromDate(item.dateTime);
 				await window.scheduledTasks.markDone(item.task.id, {
-					date: getTodayLocalISO(),
+					date: instanceDate,
 				});
 			}
 
