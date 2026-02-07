@@ -1,7 +1,7 @@
 {
 	"name": "odins-clock",
 	"productName": "Odin's Clock",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "A quiet, forge-themed desktop clock and focus companion.",
 	"author": "Moditha",
 	"main": "main.js",
